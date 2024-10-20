@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - Student Result Management System</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #1e90ff;
+            color: white;
+        }
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #1e90ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #1c86ee;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Student Results</h2>
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Subjects</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Student data will be populated here -->
+        </tbody>
+    </table>
+
+    <button class="back-button" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+
+    <script>
+        const students = JSON.parse(localStorage.getItem('students')) || {};
+
+        function renderResultsTable() {
+            const resultsTableBody = document.querySelector('#resultsTable tbody');
+            resultsTableBody.innerHTML = '';
+
+            for (const id in students) {
+                const student = students[id];
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${Object.keys(student.subjects).join(', ')}</td>
+                `;
+                resultsTableBody.appendChild(row);
+            }
+        }
+
+        // Initialize the results table
+        renderResultsTable();
+    </script>
+</body>
+
+</html>

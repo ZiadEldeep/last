@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Student Result Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMHplfUuRe1X6nF4Ih7e7J6x3I2fM2KuI7SiY" crossorigin="anonymous">
+    <style>
+        :root {
+            --background-color: #f4f4f4;
+            --text-color: #333;
+            --header-background: #007bff;
+            --nav-background: #343a40;
+            --footer-background: #343a40;
+            --card-background: white;
+            --link-color: #007bff;
+            --link-hover-color: #0056b3;
+            --toggle-icon-color: white; /* Set icon color to white */
+            --font-size: 16px; /* Default font size */
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-size: var(--font-size);
+            transition: background-color 0.3s, color 0.3s, font-size 0.3s;
+        }
+
+        header {
+            background-color: var(--header-background);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            background-color: var(--nav-background);
+            display: flex;
+            justify-content: center;
+            padding: 15px 0;
+        }
+
+        nav a {
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            margin: 0 10px;
+        }
+
+        nav a:hover {
+            background-color: #495057;
+            border-radius: 5px;
+        }
+
+        .admin-btn {
+            background-color: #dc3545;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            padding: 12px 20px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .admin-btn:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        p {
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .cards {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .team {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        footer {
+            background-color: var(--footer-background);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            --background-color: #121212;
+            --text-color: #f4f4f4;
+            --header-background: #1e1e1e;
+            --nav-background: #1e1e1e;
+            --footer-background: #1e1e1e;
+            --card-background: #2a2a2a;
+            --link-color: #bb86fc;
+            --link-hover-color: #3700b3;
+            --toggle-icon-color: white; /* Icon color remains white in dark mode */
+        }
+
+        /* Toggle button styles */
+        #darkModeToggle, #textSizeToggle {
+            background: none;
+            border: none;
+            color: var(--toggle-icon-color); /* Use variable for icon color */
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0 10px; /* Add padding for better click area */
+            transition: color 0.3s ease;
+        }
+
+        #darkModeToggle:hover, #textSizeToggle:hover {
+            color: #ffd700; /* Highlight color on hover */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>About Us</h1>
+    </header>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="results.html">View Student Results</a>
+        <a href="./contact.html">Contact Us</a>
+        <a href="./about.html">About Us</a>
+        <a href="dashboard.html" class="admin-btn">Admin Dashboard</a>
+        <button id="darkModeToggle" aria-label="Toggle dark mode">
+            <i class="fas fa-moon" id="toggleIcon"></i>
+        </button>
+        <button id="textSizeToggle" aria-label="Toggle text size">
+            <i class="fas fa-text-height" id="textToggleIcon"></i>
+        </button>
+    </nav>
+
+    <!-- Main Section -->
+    <main>
+        <h2>Our Mission</h2>
+        <div class="cards">
+            <div class="card">
+                <h3>Mission</h3>
+                <p>
+                    Our mission is to provide an efficient and user-friendly platform for students, parents, and educators to manage and access student results with ease and accuracy.
+                </p>
+            </div>
+            <div class="card">
+                <h3>Vision</h3>
+                <p>
+                    We envision a world where educational institutions can leverage technology to enhance learning experiences and outcomes, fostering transparency and accountability in student assessments.
+                </p>
+            </div>
+        </div>
+
+        <h2>Meet Our Team</h2>
+        <div class="team">
+            <div class="card team-member">
+                <h3>John Doe</h3>
+                <p>Project Manager</p>
+            </div>
+            <div class="card team-member">
+                <h3>Jane Smith</h3>
+                <p>Lead Developer</p>
+            </div>
+            <div class="card team-member">
+                <h3>Mike Johnson</h3>
+                <p>UI/UX Designer</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 Student Result Management System. All rights reserved. | 
+            <a href="#">Privacy Policy</a> | 
+            <a href="#">Terms of Service</a>
+        </p>
+    </footer>
+
+    <script>
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const textSizeToggle = document.getElementById('textSizeToggle');
+        const textToggleIcon = document.getElementById('textToggleIcon');
+
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            // Change icon based on dark mode state
+            if (document.body.classList.contains('dark-mode')) {
+                toggleIcon.classList.remove('fas', 'fa-moon');
+                toggleIcon.classList.add('fas', 'fa-sun');
+            } else {
+                toggleIcon.classList.remove('fas', 'fa-sun');
+                toggleIcon.classList.add('fas', 'fa-moon');
+            }
+        });
+
+        textSizeToggle.addEventListener('click', () => {
+            const currentSize = getComputedStyle(document.body).fontSize;
+            // Toggle between default size and larger size
+            document.body.style.fontSize = currentSize === '16px' ? '18px' : '16px';
+            // Change icon based on text size state
+            if (document.body.style.fontSize === '18px') {
+                textToggleIcon.classList.remove('fas', 'fa-text-height');
+                textToggleIcon.classList.add('fas', 'fa-text-width');
+            } else {
+                textToggleIcon.classList.remove('fas', 'fa-text-width');
+                textToggleIcon.classList.add('fas', 'fa-text-height');
+            }
+        });
+    </script>
+</body>
+</html>

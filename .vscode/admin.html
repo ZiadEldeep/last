@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Student Data</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            transition: background-color 0.3s ease;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        /* Navbar styling */
+        nav {
+            background-color: #007bff;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            z-index: 999;
+        }
+
+        nav a {
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            margin: 0 15px;
+        }
+
+        nav a:hover {
+            background-color: #0056b3;
+            border-radius: 5px;
+        }
+
+        /* Dropdown Menu Styling */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            top: 100%;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-transform: none;
+            font-weight: normal;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            padding-top: 400px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            height: 100px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .form-group button {
+            background-color: #1e90ff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .form-group button:hover {
+            background-color: #1c86ee;
+        }
+
+        .success-message {
+            color: green;
+            margin-top: 20px;
+        }
+
+        .user-management {
+            margin-top: 30px;
+            width: 80%;
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-management table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-management th,
+        .user-management td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .user-management th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .action-buttons button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        .action-buttons button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <div class="dropdown">
+            <a href="#">Features</a>
+            <div class="dropdown-content">
+                <a href="results.html">View Student Results</a>
+                <a href="profile.html">Manage Student Profiles</a>
+            </div>
+        </div>
+        <a href="./contact.html">Contact Us</a>
+        <a href="./about.html">About Us</a>
+        <a href="admin.html" class="admin-btn">Admin Dashboard</a>
+    </nav>
+
+    <div class="form-container">
+        <h2>Add/Edit Student Data</h2>
+        <form id="addStudentForm">
+            <div class="form-group">
+                <label for="studentName">Student Name</label>
+                <input type="text" id="studentName" name="studentName" required>
+            </div>
+            <div class="form-group">
+                <label for="subject">Subject</label>
+                <select id="subject" name="subject" required>
+                    <option value="">Select Subject</option>
+                    <option value="Math">Math</option>
+                    <option value="Science">Science</option>
+                    <option value="English">English</option>
+                    <option value="History">History</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="grade">Grade</label>
+                <select id="grade" name="grade" required>
+                    <option value="">Select Grade</option>
+                    <option value="A">A</option>
+                    <option value="B+">B+</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="term">Term</label>
+                <input type="text" id="term" name="term" required placeholder="e.g. 2024">
+            </div>
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" placeholder="Enter additional notes (optional)"></textarea>
+            </div>
+            <div class="form-group">
+                <button type="submit">Add Student Data</button>
+            </div>
+        </form>
+
+        <div id="successMessage" class="success-message" style="display: none;">
+            Student data has been added/updated successfully!
+        </div>
+    </div>
+
+    <div class="user-management">
+        <h2>Manage Student Data</h2>
+        <table id="userTable">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Subject</th>
+                    <th>Grade</th>
+                    <th>Term</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>John Doe</td>
+                    <td>Math</td>
+                    <td>A</td>
+                    <td>2024</td>
+                    <td class="action-buttons">
+                        <button onclick="editStudent(this)">Edit</button>
+                        <button onclick="deleteStudent(this)">Delete</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Jane Smith</td>
+                    <td>Science</td>
+                    <td>B+</td>
+                    <td>2024</td>
+                    <td class="action-buttons">
+                        <button onclick="editStudent(this)">Edit</button>
+                        <button onclick="deleteStudent(this)">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const form = document.getElementById('addStudentForm');
+        const successMessage = document.getElementById('successMessage');
+        const userTableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+        let editingRow = null;
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const studentData = {
+                studentName: form.studentName.value,
+                subject: form.subject.value,
+                grade: form.grade.value,
+                term: form.term.value,
+                notes: form.notes.value
+            };
+
+            if (editingRow) {
+                editingRow.cells[0].innerText = studentData.studentName;
+                editingRow.cells[1].innerText = studentData.subject;
+                editingRow.cells[2].innerText = studentData.grade;
+                editingRow.cells[3].innerText = studentData.term;
+                editingRow = null;
+            } else {
+                const newRow = userTableBody.insertRow();
+                newRow.insertCell().innerText = studentData.studentName;
+                newRow.insertCell().innerText = studentData.subject;
+                newRow.insertCell().innerText = studentData.grade;
+                newRow.insertCell().innerText = studentData.term;
+                const actionsCell = newRow.insertCell();
+                actionsCell.classList.add('action-buttons');
+                actionsCell.innerHTML = `
+                    <button onclick="editStudent(this)">Edit</button>
+                    <button onclick="deleteStudent(this)">Delete</button>
+                `;
+            }
+
+            form.reset();
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 2000);
+        });
+
+        function editStudent(button) {
+            const row = button.parentElement.parentElement;
+            form.studentName.value = row.cells[0].innerText;
+            form.subject.value = row.cells[1].innerText;
+            form.grade.value = row.cells[2].innerText;
+            form.term.value = row.cells[3].innerText;
+            editingRow = row;
+        }
+
+        function deleteStudent(button) {
+            const row = button.parentElement.parentElement;
+            row.remove();
+        }
+    </script>
+</body>
+
+</html>

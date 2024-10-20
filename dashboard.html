@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Student Result Management System</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            transition: background-color 0.3s ease;
+        }
+
+        body.dark-mode {
+            background-color: #1c1c1c;
+            color: #ccc;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #1e90ff;
+            color: white;
+            height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar.dark-mode {
+            background-color: #333;
+        }
+
+        .sidebar h2 {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            display: block;
+            padding: 10px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: #1c86ee;
+        }
+
+        .sidebar.dark-mode a {
+            color: #ccc;
+        }
+
+        .sidebar.dark-mode a:hover {
+            background-color: #444;
+        }
+
+        .logout-btn {
+            background-color: #ff4c4c;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            transition: background-color 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .main-content h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .result-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .result-summary div {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 30%;
+            text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative; /* For animation effect */
+        }
+
+        .result-summary div span {
+            display: inline-block;
+            font-size: 1.5em; /* Larger text for animation */
+            transition: transform 0.3s ease;
+        }
+
+        .main-content.dark-mode .result-summary div {
+            background-color: #333;
+            color: #ccc;
+        }
+
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .result-card {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .main-content.dark-mode .result-card {
+            background-color: #333;
+            color: #ccc;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-section label {
+            margin-right: 10px;
+        }
+
+        .filter-section select,
+        .filter-section input {
+            padding: 5px;
+            margin-right: 10px;
+        }
+
+        /* Dark mode button */
+        .dark-mode-toggle {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: #555;
+        }
+
+        /* Student Form */
+        .student-form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .student-form input,
+        .student-form button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .student-form button {
+            background-color: #1e90ff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .student-form button:hover {
+            background-color: #1c86ee;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .result-summary {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .result-summary div {
+                width: 100%;
+            }
+
+            .sidebar {
+                width: 200px; /* Decrease width on smaller screens */
+            }
+
+            .main-content {
+                padding: 10px; /* Adjust padding for smaller screens */
+            }
+
+            .filter-section {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-section select,
+            .filter-section input {
+                width: auto; /* Allow for auto-width on smaller screens */
+                margin: 5px 0; /* Adjust margin */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar h2 {
+                font-size: 20px; /* Adjust font size for very small screens */
+            }
+
+            .main-content h2 {
+                font-size: 24px; /* Adjust font size for very small screens */
+            }
+
+            .result-summary div {
+                padding: 15px; /* Reduce padding in summary cards */
+            }
+
+            .student-form button {
+                padding: 8px; /* Reduce button padding */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div>
+            <h2>Student Dashboard</h2>
+            <a href="index.html">Home</a>
+            <a href="results.html">View Results</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="about.html">About Us</a>
+        </div>
+        <div>
+            <button id="darkModeToggle" class="dark-mode-toggle">Enable Dark Mode</button>
+            <a href="login.html" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h2 id="student-name">Welcome, [Student Name]</h2>
+
+        <!-- Filter Section (Student Selector) -->
+        <div class="filter-section">
+            <label for="student-select">Select Student:</label>
+            <select id="student-select">
+                <option value="" disabled selected>Select a student</option>
+                <!-- Student options dynamically populated -->
+            </select>
+        </div>
+
+        <!-- Result Summary -->
+        <div class="result-summary" id="result-summary">
+            <!-- These will be filled dynamically -->
+            <div><strong>Total Subjects:</strong> <span id="total-subjects">0</span></div>
+            <div><strong>Average Grade:</strong> <span id="average-grade">0.00</span></div>
+            <div><strong>Whole Average:</strong> <span id="whole-average">0.00</span></div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="results-section">
+            <!-- These will be filled dynamically -->
+        </div>
+
+        <!-- Add/Edit Student Form -->
+        <h3>Add/Edit Student</h3>
+        <form id="studentForm" class="student-form">
+            <input type="hidden" id="studentId" value="">
+            <label for="studentName">Name:</label>
+            <input type="text" id="studentName" required>
+            <div id="subject-container">
+                <div class="subject-entry">
+                    <label for="subject">Subject:</label>
+                    <input type="text" class="subject" required>
+                    <label for="grade">Grade:</label>
+                    <input type="text" class="grade" required>
+                    <button type="button" class="remove-subject" onclick="removeSubject(this)">Remove Subject</button>
+                </div>
+            </div>
+            <button type="button" onclick="addSubject()">Add Another Subject</button>
+            <button type="submit">Add Student</button>
+        </form>
+
+        <!-- Student List -->
+        <h3>Student List</h3>
+        <div class="filter-section">
+            <label for="search">Search:</label>
+            <input type="text" id="search" oninput="filterStudents()">
+        </div>
+        <table id="studentTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Subjects</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Student rows dynamically populated -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const students = JSON.parse(localStorage.getItem('students')) || {};
+        const dummyData = {
+            '1': { name: 'John Doe', subjects: { 'Math': 'A', 'Science': 'B' } },
+            '2': { name: 'Jane Smith', subjects: { 'English': 'B', 'History': 'A' } },
+            '3': { name: 'Alice Johnson', subjects: { 'Math': 'C', 'Biology': 'A' } },
+            '4': { name: 'Bob Brown', subjects: { 'Chemistry': 'B', 'Physics': 'B' } },
+            '5': { name: 'Charlie Davis', subjects: { 'Geography': 'A', 'Art': 'C' } }
+        };
+
+        function initializeDummyData() {
+            if (Object.keys(students).length === 0) {
+                Object.keys(dummyData).forEach(id => {
+                    students[id] = dummyData[id];
+                });
+                localStorage.setItem('students', JSON.stringify(students));
+            }
+        }
+
+        function populateStudentSelect() {
+            const studentSelect = document.getElementById('student-select');
+            studentSelect.innerHTML = '<option value="" disabled selected>Select a student</option>'; // Clear existing options
+
+            for (const id in students) {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = students[id].name;
+                studentSelect.appendChild(option);
+            }
+        }
+
+        function populateResults() {
+            const resultSummary = document.getElementById('result-summary');
+            const totalSubjects = document.getElementById('total-subjects');
+            const averageGrade = document.getElementById('average-grade');
+            const wholeAverage = document.getElementById('whole-average');
+            const resultsSection = document.getElementById('results-section');
+            resultSummary.innerHTML = '';
+            resultsSection.innerHTML = '';
+
+            const selectedId = document.getElementById('student-select').value;
+            if (selectedId && students[selectedId]) {
+                const student = students[selectedId];
+                const subjects = Object.entries(student.subjects);
+                animateCount(totalSubjects, subjects.length);
+                averageGrade.textContent = calculateAverageGrade(subjects);
+                wholeAverage.textContent = calculateWholeAverage(subjects);
+
+                subjects.forEach(([subject, grade]) => {
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'result-card';
+                    resultCard.innerHTML = `<strong>${subject}</strong>: ${grade}`;
+                    resultsSection.appendChild(resultCard);
+                });
+            }
+        }
+
+        function animateCount(element, target) {
+            const start = parseInt(element.textContent, 10);
+            const end = target;
+            const duration = 1000; // 1 second
+            const stepTime = Math.abs(Math.floor(duration / (end - start)));
+
+            let current = start;
+            const increment = end > start ? 1 : -1;
+
+            const step = () => {
+                current += increment;
+                element.textContent = current;
+                if (current !== end) {
+                    setTimeout(step, stepTime);
+                }
+            };
+            step();
+        }
+
+        function calculateAverageGrade(subjects) {
+            const grades = subjects.map(([_, grade]) => grade);
+            const gradePoints = {
+                'A': 4,
+                'B': 3,
+                'C': 2,
+                'D': 1,
+                'F': 0
+            };
+
+            const totalPoints = grades.reduce((sum, grade) => sum + (gradePoints[grade] || 0), 0);
+            return (totalPoints / grades.length).toFixed(2);
+        }
+
+        function calculateWholeAverage(subjects) {
+            const grades = subjects.map(([_, grade]) => grade);
+            const gradePoints = {
+                'A': 4,
+                'B': 3,
+                'C': 2,
+                'D': 1,
+                'F': 0
+            };
+
+            const totalPoints = grades.reduce((sum, grade) => sum + (gradePoints[grade] || 0), 0);
+            return (totalPoints / grades.length).toFixed(2);
+        }
+
+        document.getElementById('student-select').addEventListener('change', function () {
+            populateResults();
+        });
+
+        document.getElementById('studentForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const studentId = document.getElementById('studentId').value || Date.now().toString();
+            const studentName = document.getElementById('studentName').value;
+            const subjects = {};
+            const subjectElements = document.querySelectorAll('.subject');
+            const gradeElements = document.querySelectorAll('.grade');
+
+            subjectElements.forEach((subjectEl, index) => {
+                const subject = subjectEl.value;
+                const grade = gradeElements[index].value;
+                subjects[subject] = grade;
+            });
+
+            students[studentId] = { name: studentName, subjects };
+            localStorage.setItem('students', JSON.stringify(students));
+            populateStudentSelect();
+            populateResults();
+            clearForm();
+            renderStudentTable();
+        });
+
+        function clearForm() {
+            document.getElementById('studentId').value = '';
+            document.getElementById('studentName').value = '';
+            document.querySelectorAll('.subject').forEach(input => input.value = '');
+            document.querySelectorAll('.grade').forEach(input => input.value = '');
+        }
+
+        function renderStudentTable() {
+            const studentTableBody = document.querySelector('#studentTable tbody');
+            studentTableBody.innerHTML = '';
+
+            for (const id in students) {
+                const student = students[id];
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${Object.keys(student.subjects).join(', ')}</td>
+                    <td>
+                        <button onclick="editStudent('${id}')">Edit</button>
+                        <button onclick="deleteStudent('${id}')">Delete</button>
+                    </td>
+                `;
+                studentTableBody.appendChild(row);
+            }
+        }
+
+        function editStudent(id) {
+            const student = students[id];
+            document.getElementById('studentId').value = id;
+            document.getElementById('studentName').value = student.name;
+            clearSubjects(); // Clear existing subjects
+            Object.entries(student.subjects).forEach(([subject, grade]) => {
+                addSubject(subject, grade);
+            });
+            renderStudentTable();
+        }
+
+        function clearSubjects() {
+            document.querySelectorAll('.subject-entry').forEach(subjectEntry => subjectEntry.remove());
+        }
+
+        function addSubject(subject = '', grade = '') {
+            const subjectContainer = document.getElementById('subject-container');
+            const subjectEntry = document.createElement('div');
+            subjectEntry.className = 'subject-entry';
+            subjectEntry.innerHTML = `
+                <label for="subject">Subject:</label>
+                <input type="text" class="subject" value="${subject}" required>
+                <label for="grade">Grade:</label>
+                <input type="text" class="grade" value="${grade}" required>
+                <button type="button" class="remove-subject" onclick="removeSubject(this)">Remove Subject</button>
+            `;
+            subjectContainer.appendChild(subjectEntry);
+        }
+
+        function removeSubject(button) {
+            button.parentElement.remove();
+        }
+
+        function deleteStudent(id) {
+            delete students[id];
+            localStorage.setItem('students', JSON.stringify(students));
+            populateStudentSelect();
+            renderStudentTable();
+            populateResults();
+        }
+
+        function filterStudents() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const filteredStudents = Object.keys(students).filter(id => students[id].name.toLowerCase().includes(query));
+            const studentSelect = document.getElementById('student-select');
+            studentSelect.innerHTML = '<option value="" disabled selected>Select a student</option>'; // Clear existing options
+
+            filteredStudents.forEach(id => {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = students[id].name;
+                studentSelect.appendChild(option);
+            });
+        }
+
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('dark-mode');
+            const resultCards = document.querySelectorAll('.result-card');
+            resultCards.forEach(card => card.classList.toggle('dark-mode'));
+            const resultSummary = document.querySelectorAll('.result-summary div');
+            resultSummary.forEach(summary => summary.classList.toggle('dark-mode'));
+            darkModeToggle.textContent = darkModeToggle.textContent.includes('Enable') ? 'Disable Dark Mode' : 'Enable Dark Mode';
+        });
+
+        // Initialize the app
+        initializeDummyData();
+        populateStudentSelect();
+        renderStudentTable();
+    </script>
+</body>
+
+</html>
