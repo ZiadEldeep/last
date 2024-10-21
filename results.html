@@ -11,21 +11,28 @@
             background-color: #f4f4f4;
             padding: 20px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #ccc;
             padding: 10px;
             text-align: left;
         }
+
         th {
             background-color: #1e90ff;
             color: white;
         }
-        .back-button {
+
+        .back-button,
+        .sort-button,
+        .export-button {
             margin-top: 20px;
             padding: 10px 20px;
             background-color: #1e90ff;
@@ -34,19 +41,56 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .back-button:hover {
+
+        .sort-button {
+            margin-right: 10px;
+        }
+
+        .back-button:hover,
+        .sort-button:hover,
+        .export-button:hover {
             background-color: #1c86ee;
         }
+
+        select {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
     </style>
+    <!-- Include jsPDF and docx library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.1.0/docx.min.js"></script>
 </head>
 
 <body>
     <h2>Student Results</h2>
+
+    <!-- Sort and Export Buttons -->
+    <button class="sort-button" onclick="sortStudents('asc')">Sort by Grades Ascending</button>
+    <button class="sort-button" onclick="sortStudents('desc')">Sort by Grades Descending</button>
+    
+    <select id="exportSelect" class="export-button" onchange="toggleDownloadButton()">
+        <option value="">Select Export Format</option>
+        <option value="excel">Export to Excel</option>
+        <!-- <option value="pdf">Export to PDF</option> -->
+        <!-- <option value="word">Export to Word</option> -->
+    </select>
+
+    <button id="downloadButton" class="export-button hidden" onclick="exportData()">Download</button>
+
+    <button class="back-button" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+
     <table id="resultsTable">
         <thead>
             <tr>
                 <th>Name</th>
                 <th>Subjects</th>
+                <th>Grades</th>
             </tr>
         </thead>
         <tbody>
@@ -54,28 +98,204 @@
         </tbody>
     </table>
 
-    <button class="back-button" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
-
     <script>
+        // Fetch student data from localStorage
         const students = JSON.parse(localStorage.getItem('students')) || {};
 
-        function renderResultsTable() {
+        // Function to convert grades into a numerical value for sorting
+        function gradeToNumber(grade) {
+            const gradeMapping = {
+                "A+": 4.3,
+                "A": 4.0,
+                "A-": 3.7,
+                "B+": 3.3,
+                "B": 3.0,
+                "B-": 2.7,
+                "C+": 2.3,
+                "C": 2.0,
+                "C-": 1.7,
+                "D+": 1.3,
+                "D": 1.0,
+                "F": 0
+            };
+            return gradeMapping[grade] || 0;
+        }
+
+        // Function to calculate the average grade for a student
+        function calculateAverageGrade(subjects) {
+            const grades = Object.values(subjects);
+            const totalGrade = grades.reduce((sum, grade) => sum + gradeToNumber(grade), 0);
+            return grades.length ? (totalGrade / grades.length) : 0; // Avoid division by zero
+        }
+
+        // Function to render the results table
+        function renderResultsTable(sortedStudents) {
             const resultsTableBody = document.querySelector('#resultsTable tbody');
             resultsTableBody.innerHTML = '';
 
-            for (const id in students) {
-                const student = students[id];
+            for (const student of sortedStudents) {
+                const subjectsWithGrades = Object.keys(student.subjects)
+                    .map(subject => `${subject}: ${student.subjects[subject]}`)
+                    .join(', ');
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${student.name}</td>
                     <td>${Object.keys(student.subjects).join(', ')}</td>
+                    <td>${subjectsWithGrades}</td>
                 `;
                 resultsTableBody.appendChild(row);
             }
         }
 
-        // Initialize the results table
-        renderResultsTable();
+        // Function to sort students based on their average grades
+        function sortStudentsByGrades(students, ascending) {
+            return Object.values(students).sort((a, b) => {
+                const avgA = calculateAverageGrade(a.subjects);
+                const avgB = calculateAverageGrade(b.subjects);
+                return ascending ? avgA - avgB : avgB - avgA;
+            });
+        }
+
+        // Function to sort students based on the specified order
+        function sortStudents(order) {
+            const sortedStudents = sortStudentsByGrades(students, order === 'asc');
+            renderResultsTable(sortedStudents);
+        }
+
+        // Function to enable the download button based on selected format
+        function toggleDownloadButton() {
+            const exportFormat = document.getElementById('exportSelect').value;
+            const downloadButton = document.getElementById('downloadButton');
+            downloadButton.classList.toggle('hidden', !exportFormat); // Show or hide button
+        }
+
+        // Function to export results to the selected format
+        function exportData() {
+            const exportFormat = document.getElementById('exportSelect').value;
+            switch (exportFormat) {
+                case 'excel':
+                    exportToExcel();
+                    break;
+                case 'pdf':
+                    exportToPDF();
+                    break;
+                case 'word':
+                    exportToWord();
+                    break;
+                default:
+                    alert("Please select a valid export format.");
+            }
+            document.getElementById('exportSelect').value = ''; // Reset the select
+            toggleDownloadButton(); // Hide the button after download
+        }
+
+        // Function to export results to an Excel file
+        function exportToExcel() {
+            const sortedStudents = sortStudentsByGrades(students, true); // Sort ascending for export
+            let csvContent = "data:text/csv;charset=utf-8,";
+
+            // Create CSV headers
+            csvContent += "Name,Subjects,Grades\n";
+
+            // Create CSV rows
+            sortedStudents.forEach(student => {
+                const subjectsWithGrades = Object.keys(student.subjects)
+                    .map(subject => `${subject}: ${student.subjects[subject]}`)
+                    .join(', ');
+                const row = `${student.name},"${Object.keys(student.subjects).join(', ')}","${subjectsWithGrades}"\n`;
+                csvContent += row;
+            });
+
+            // Create a downloadable link and click it
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "student_results.csv");
+            document.body.appendChild(link); // Required for FF
+            link.click();
+            document.body.removeChild(link); // Clean up
+        }
+
+        // Function to export results to a PDF file
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add title
+            doc.text("Student Results", 14, 16);
+            doc.setFontSize(12);
+
+            // Create PDF headers
+            const headers = ["Name", "Subjects", "Grades"];
+            const rows = [];
+
+            // Prepare data for PDF
+            const sortedStudents = sortStudentsByGrades(students, true);
+            sortedStudents.forEach(student => {
+                const subjectsWithGrades = Object.keys(student.subjects)
+                    .map(subject => `${subject}: ${student.subjects[subject]}`)
+                    .join(', ');
+                rows.push([student.name, Object.keys(student.subjects).join(', '), subjectsWithGrades]);
+            });
+
+            // Add table to PDF
+            doc.autoTable({
+                head: [headers],
+                body: rows,
+            });
+
+            // Save the PDF
+            doc.save("student_results.pdf");
+        }
+
+        // Function to export results to a Word file
+        function exportToWord() {
+            const { Document, Packer, Paragraph, TextRun } = window.docx;
+            const doc = new Document();
+
+            // Create a title
+            doc.addSection({
+                properties: {},
+                children: [
+                    new Paragraph({
+                        children: [
+                            new TextRun("Student Results"),
+                        ],
+                    }),
+                ],
+            });
+
+            // Prepare data for Word
+            const sortedStudents = sortStudentsByGrades(students, true);
+            sortedStudents.forEach(student => {
+                const subjectsWithGrades = Object.keys(student.subjects)
+                    .map(subject => `${subject}: ${student.subjects[subject]}`)
+                    .join(', ');
+                doc.addSection({
+                    children: [
+                        new Paragraph(`Name: ${student.name}`),
+                        new Paragraph(`Subjects: ${Object.keys(student.subjects).join(', ')}`),
+                        new Paragraph(`Grades: ${subjectsWithGrades}`),
+                        new Paragraph(""), // Add a blank line
+                    ],
+                });
+            });
+
+            // Save the Word file
+            Packer.toBlob(doc).then(blob => {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "student_results.docx";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        }
+
+        // Initial rendering of the table
+        const sortedStudents = sortStudentsByGrades(students, true);
+        renderResultsTable(sortedStudents);
     </script>
 </body>
 
