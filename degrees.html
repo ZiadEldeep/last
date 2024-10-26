@@ -305,10 +305,10 @@
         <div class="form-container">
             <h2>Grade Calculator</h2>
             <input type="text" id="studentName" placeholder="Enter your name" required>
-            <input type="number" id="midterm" placeholder="Midterm Grade (0-100)" required min="0" max="100">
-            <input type="number" id="final" placeholder="Final Grade (0-100)" required min="0" max="100">
-            <input type="number" id="quiz" placeholder="Quiz Grade (0-100)" required min="0" max="100">
-            <input type="number" id="assignments" placeholder="Assignments Grade (0-100)" required min="0" max="100">
+            <input type="number" id="midterm" placeholder="Midterm Grade (0-30)" required min="0" max="100">
+            <input type="number" id="final" placeholder="Final Grade (0-50)" required min="0" max="100">
+            <input type="number" id="quiz" placeholder="Quiz Grade (0-10)" required min="0" max="100">
+            <input type="number" id="assignments" placeholder="Assignments Grade (0-10)" required min="0" max="100">
             <button onclick="calculateGrades()">Calculate</button>
 
             <div class="result" id="result"></div>
@@ -358,8 +358,8 @@
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${name}</td>
-                <td>${total.toFixed(2)}</td>
-                <td>${average.toFixed(2)}</td>
+                <td>${total.toFixed(2)+"/100"}</td>
+                <td>${average.toFixed(2)+"%"}</td>
                 <td class="action-buttons">
                     <button class="edit-button" onclick="editResult(this)">Edit</button>
                     <button class="delete-button" onclick="deleteResult(this)">Delete</button>
