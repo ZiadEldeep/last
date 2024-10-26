@@ -123,10 +123,6 @@
             return grade === null ? 0 : grade; // Treat null as 0
         }
 
-        function generateRandomAverage() {
-            return (Math.random() * 4).toFixed(2); // Random number between 0 and 4
-        }
-
         function calculateAverageGrade(subjects) {
             const grades = Object.values(subjects);
             const totalGrade = grades.reduce((sum, grade) => sum + gradeToNumber(grade), 0);
@@ -145,14 +141,12 @@
                     .join(', ');
 
                 const avgGrade = calculateAverageGrade(student.subjects);
-                const displayAvgGrade = generateRandomAverage(); // Always show random average between 0 and 4
-
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${student.name}</td>
                     <td>${Object.keys(student.subjects).join(', ')}</td>
                     <td>${subjectsWithGrades}</td>
-                    <td>${displayAvgGrade}</td>
+                    <td>${avgGrade}</td>
                     <td><button class="delete-button" onclick="deleteStudent('${studentId}')">Delete</button></td>
                 `;
                 resultsTableBody.appendChild(row);
@@ -169,8 +163,8 @@
 
         function sortStudents(order) {
             const sortedStudents = Object.values(students).sort((a, b) => {
-                const avgA = generateRandomAverage(); // For sorting, use random average
-                const avgB = generateRandomAverage();
+                const avgA = calculateAverageGrade(a.subjects);
+                const avgB = calculateAverageGrade(b.subjects);
                 return order === 'asc' ? avgA - avgB : avgB - avgA;
             });
             renderSortedTable(sortedStudents);
@@ -185,14 +179,13 @@
                     .map(subject => `${subject}: ${student.subjects[subject] || 'No Data'}`)
                     .join(', ');
 
-                const displayAvgGrade = generateRandomAverage(); // Always show random average between 0 and 4
-
+                const avgGrade = calculateAverageGrade(student.subjects);
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${student.name}</td>
                     <td>${Object.keys(student.subjects).join(', ')}</td>
                     <td>${subjectsWithGrades}</td>
-                    <td>${displayAvgGrade}</td>
+                    <td>${avgGrade}</td>
                     <td><button class="delete-button" onclick="deleteStudent('${studentId}')">Delete</button></td>
                 `;
                 resultsTableBody.appendChild(row);
@@ -226,8 +219,8 @@
                 const subjectsWithGrades = Object.keys(student.subjects)
                     .map(subject => `${subject}: ${student.subjects[subject] || 'No Data'}`)
                     .join(', ');
-                const displayAvgGrade = generateRandomAverage(); // Always show random average between 0 and 4
-                const row = `${student.name},"${Object.keys(student.subjects).join(', ')}","${subjectsWithGrades}","${displayAvgGrade}"\n`;
+                const avgGrade = calculateAverageGrade(student.subjects);
+                const row = `${student.name},"${Object.keys(student.subjects).join(', ')}","${subjectsWithGrades}","${avgGrade}"\n`;
                 csvContent += row;
             });
 

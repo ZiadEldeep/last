@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-wrap: nowrap;
+            height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar {
+            width: 200px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            margin-left: 220px; /* Space for the sidebar */
+            padding: 20px;
+            width: calc(100% - 220px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            transition: background-color 0.3s;
+        }
+
+        .form-container {
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px; /* Maximum width for the form */
+            text-align: center;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .form-container input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .form-container button {
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .saved-results {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: background-color 0.3s;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ccc;
+            transition: background-color 0.3s;
+        }
+
+        th {
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .edit-button, .delete-button {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-switch {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-switch label {
+            margin-left: 10px;
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #181818;
+            color: #f0f4f8;
+        }
+
+        .sidebar.dark-mode {
+            background-color: #1e1e1e;
+        }
+
+        .sidebar a.dark-mode {
+            color: #f0f4f8;
+        }
+
+        .content.dark-mode {
+            background-color: #242424;
+        }
+
+        .form-container.dark-mode {
+            background-color: #242424;
+        }
+
+        .form-container input.dark-mode {
+            background-color: #333;
+            color: #f0f4f8;
+            border: 1px solid #444;
+        }
+
+        .form-container button.dark-mode {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .form-container button.dark-mode:hover {
+            background-color: #0056b3;
+        }
+
+        table.dark-mode {
+            background-color: #242424;
+        }
+
+        th.dark-mode {
+            background-color: #333;
+            color: white;
+        }
+
+        td.dark-mode {
+            background-color: #242424;
+            color: #f0f4f8;
+        }
+
+        /* Button Styles for Edit and Delete in Dark Mode */
+        .edit-button.dark-mode {
+            background-color: #ffc107;
+            color: white;
+        }
+
+        .edit-button.dark-mode:hover {
+            background-color: #e0a800;
+        }
+
+        .delete-button.dark-mode {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .delete-button.dark-mode:hover {
+            background-color: #c82333;
+        }
+
+        /* Light Mode Styles (default) */
+        body {
+            background-color: #f0f4f8;
+            color: #333;
+        }
+
+        .sidebar {
+            background-color: #ffffff;
+            color: #333;
+        }
+
+        .sidebar a {
+            color: #333;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+        }
+
+        .form-container input {
+            background-color: #ffffff;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+        .form-container button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            background-color: #ffffff;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        td {
+            background-color: #ffffff;
+            color: #333;
+        }
+
+        .edit-button {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .edit-button:hover {
+            background-color: #e0a800;
+        }
+
+        .delete-button {
+            background-color: #dc3545;
+            color: #333;
+        }
+
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .form-container {
+                width: calc(100% - 40px); /* Full width minus padding */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2><i class="fas fa-user-graduate"></i> Student Dashboard</h2>
+        <a href="index.html">Home</a>
+        <a href="results.html">View Results</a>
+        <a href="degrees.html">Degrees Calculator</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="about.html">About Us</a>
+    </div>
+
+    <div class="content">
+        <div class="toggle-switch">
+            <label>
+                <input type="checkbox" id="themeToggle"> Toggle Dark Mode
+            </label>
+        </div>
+
+        <div class="form-container">
+            <h2>Grade Calculator</h2>
+            <input type="text" id="studentName" placeholder="Enter your name" required>
+            <input type="number" id="midterm" placeholder="Midterm Grade (0-100)" required min="0" max="100">
+            <input type="number" id="final" placeholder="Final Grade (0-100)" required min="0" max="100">
+            <input type="number" id="quiz" placeholder="Quiz Grade (0-100)" required min="0" max="100">
+            <input type="number" id="assignments" placeholder="Assignments Grade (0-100)" required min="0" max="100">
+            <button onclick="calculateGrades()">Calculate</button>
+
+            <div class="result" id="result"></div>
+        </div>
+
+        <div class="saved-results">
+            <h4>Saved Results:</h4>
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Total</th>
+                        <th>Average</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+            document.querySelector('.sidebar').classList.toggle('dark-mode');
+            document.querySelector('.form-container').classList.toggle('dark-mode');
+            document.querySelectorAll('table').forEach(table => table.classList.toggle('dark-mode'));
+            document.querySelectorAll('th').forEach(th => th.classList.toggle('dark-mode'));
+            document.querySelectorAll('td').forEach(td => td.classList.toggle('dark-mode'));
+            document.querySelectorAll('.edit-button').forEach(button => button.classList.toggle('dark-mode'));
+            document.querySelectorAll('.delete-button').forEach(button => button.classList.toggle('dark-mode'));
+            document.querySelectorAll('.sidebar a').forEach(link => link.classList.toggle('dark-mode'));
+        });
+
+        function calculateGrades() {
+            const name = document.getElementById('studentName').value;
+            const midterm = parseFloat(document.getElementById('midterm').value);
+            const final = parseFloat(document.getElementById('final').value);
+            const quiz = parseFloat(document.getElementById('quiz').value);
+            const assignments = parseFloat(document.getElementById('assignments').value);
+
+            const total = midterm + final + quiz + assignments;
+            const average = total / 4;
+
+            const resultsTable = document.getElementById('resultsTable').querySelector('tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${name}</td>
+                <td>${total.toFixed(2)}</td>
+                <td>${average.toFixed(2)}</td>
+                <td class="action-buttons">
+                    <button class="edit-button" onclick="editResult(this)">Edit</button>
+                    <button class="delete-button" onclick="deleteResult(this)">Delete</button>
+                </td>
+            `;
+            resultsTable.appendChild(row);
+            clearForm();
+        }
+
+        function editResult(button) {
+            const row = button.parentElement.parentElement;
+            document.getElementById('studentName').value = row.cells[0].innerText;
+            document.getElementById('midterm').value = row.cells[1].innerText; // Adjust index based on your needs
+            document.getElementById('final').value = row.cells[2].innerText; // Adjust index based on your needs
+            // Additional logic for editing as needed
+            deleteResult(button); // Remove the existing entry to avoid duplication
+        }
+
+        function deleteResult(button) {
+            const row = button.parentElement.parentElement;
+            row.remove();
+        }
+
+        function clearForm() {
+            document.getElementById('studentName').value = '';
+            document.getElementById('midterm').value = '';
+            document.getElementById('final').value = '';
+            document.getElementById('quiz').value = '';
+            document.getElementById('assignments').value = '';
+        }
+
+        // Display saved results on load
+        displaySavedResults();
+    </script>
+</body>
+
+</html>
