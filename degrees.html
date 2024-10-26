@@ -354,32 +354,33 @@
             const total = midterm + final + quiz + assignments;
             const average = total / 4;
 
-            const resultsTable = document.getElementById('resultsTable').querySelector('tbody');
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${name}</td>
-                <td>${total.toFixed(2)+"/100"}</td>
-                <td>${average.toFixed(2)+"%"}</td>
-                <td class="action-buttons">
-                    <button class="edit-button" onclick="editResult(this)">Edit</button>
-                    <button class="delete-button" onclick="deleteResult(this)">Delete</button>
-                </td>
-            `;
-            resultsTable.appendChild(row);
+            // Save result to local storage
+            const results = JSON.parse(localStorage.getItem('results')) || [];
+            results.push({ name, total, average });
+            localStorage.setItem('results', JSON.stringify(results));
+
+            // Display updated results
+            displaySavedResults();
             clearForm();
         }
 
         function editResult(button) {
             const row = button.parentElement.parentElement;
             document.getElementById('studentName').value = row.cells[0].innerText;
-            document.getElementById('midterm').value = row.cells[1].innerText; // Adjust index based on your needs
-            document.getElementById('final').value = row.cells[2].innerText; // Adjust index based on your needs
-            // Additional logic for editing as needed
+            document.getElementById('midterm').value = parseFloat(row.cells[1].innerText.split('/')[0]);
+            document.getElementById('final').value = parseFloat(row.cells[2].innerText.split('%')[0]);
             deleteResult(button); // Remove the existing entry to avoid duplication
         }
 
         function deleteResult(button) {
             const row = button.parentElement.parentElement;
+            const name = row.cells[0].innerText;
+
+            // Remove from local storage
+            let results = JSON.parse(localStorage.getItem('results')) || [];
+            results = results.filter(result => result.name !== name);
+            localStorage.setItem('results', JSON.stringify(results));
+
             row.remove();
         }
 
@@ -389,6 +390,26 @@
             document.getElementById('final').value = '';
             document.getElementById('quiz').value = '';
             document.getElementById('assignments').value = '';
+        }
+
+        function displaySavedResults() {
+            const resultsTable = document.getElementById('resultsTable').querySelector('tbody');
+            resultsTable.innerHTML = ''; // Clear current rows
+
+            const results = JSON.parse(localStorage.getItem('results')) || [];
+            results.forEach(({ name, total, average }) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${name}</td>
+                    <td>${total.toFixed(2)}/100</td>
+                    <td>${average.toFixed(2)}%</td>
+                    <td class="action-buttons">
+                        <button class="edit-button" onclick="editResult(this)">Edit</button>
+                        <button class="delete-button" onclick="deleteResult(this)">Delete</button>
+                    </td>
+                `;
+                resultsTable.appendChild(row);
+            });
         }
 
         // Display saved results on load
