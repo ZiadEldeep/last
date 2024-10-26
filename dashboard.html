@@ -255,24 +255,6 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <h2 id="student-name">Welcome, [Student Name]</h2>
-
-        <!-- Filter Section (Student Selector) -->
-        <div class="filter-section">
-            <label for="student-select">Select Student:</label>
-            <select id="student-select">
-                <option value="" disabled selected>Select a student</option>
-                <!-- Student options dynamically populated -->
-            </select>
-        </div>
-
-        <!-- Result Summary -->
-        <div class="result-summary" id="result-summary">
-            <!-- These will be filled dynamically -->
-            <div><strong>Total Subjects:</strong> <span id="total-subjects">0</span></div>
-            <div><strong>Average Grade:</strong> <span id="average-grade">0.00</span></div>
-            <div><strong>Whole Average:</strong> <span id="whole-average">0.00</span></div>
-        </div>
 
         <!-- Results Section -->
         <div class="results-section" id="results-section">
@@ -289,8 +271,10 @@
                 <div class="subject-entry">
                     <label for="subject">Subject:</label>
                     <input type="text" class="subject" required>
-                    <label for="grade">Grade:</label>
-                    <input type="text" class="grade" required>
+                    <label for="midTerm">Mid Term:</label>
+                    <input type="text" class="midTerm" required>
+                    <label for="final">Final:</label>
+                    <input type="text" class="final" required>
                     <button type="button" class="remove-subject" onclick="removeSubject(this)">Remove Subject</button>
                 </div>
             </div>
@@ -317,202 +301,29 @@
                 <!-- Student entries dynamically populated -->
             </tbody>
         </table>
+
+        <!-- Overall Average Section -->
+        <h3>Overall Average Grade: <span id="overallAverage">0.00</span></h3>
+
+        <!-- All Students Data Section -->
+        <h3>All Students Data</h3>
+        <table id="allStudentsTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Subjects</th>
+                    <th>Mid Terms</th>
+                    <th>Finals</th>
+                    <th>Average Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- All student data dynamically populated -->
+            </tbody>
+        </table>
     </div>
 
-    <script>
-        // Initializing students from localStorage
-        let students = JSON.parse(localStorage.getItem('students')) || {};
-
-        function calculateAverageGrade(subjects) {
-            const grades = subjects.map(([_, grade]) => grade);
-            const gradePoints = {
-                'A': 4,
-                'B': 3,
-                'C': 2,
-                'D': 1,
-                'F': 0
-            };
-
-            const totalPoints = grades.reduce((sum, grade) => sum + (gradePoints[grade] || 0), 0);
-            return grades.length > 0 ? (totalPoints / grades.length).toFixed(2) : '0.00';
-        }
-
-        document.getElementById('studentForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const studentId = document.getElementById('studentId').value || Date.now().toString();
-            const studentName = document.getElementById('studentName').value;
-            const subjects = {};
-            const subjectElements = document.querySelectorAll('.subject');
-            const gradeElements = document.querySelectorAll('.grade');
-
-            subjectElements.forEach((subjectEl, index) => {
-                const subject = subjectEl.value;
-                const grade = gradeElements[index].value;
-                subjects[subject] = grade;
-            });
-
-            const averageGrade = calculateAverageGrade(Object.entries(subjects));
-            students[studentId] = { name: studentName, subjects, averageGrade };
-            
-            localStorage.setItem('students', JSON.stringify(students));
-            populateStudentSelect();
-            populateResults();
-            clearForm();
-            renderStudentTable();
-        });
-
-        function renderStudentTable() {
-            const studentTableBody = document.querySelector('#studentTable tbody');
-            studentTableBody.innerHTML = '';
-
-            for (const id in students) {
-                const student = students[id];
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${student.name}</td>
-                    <td>${Object.keys(student.subjects).join(', ')}</td>
-                    <td>${student.averageGrade}</td> <!-- Displaying average grade -->
-                    <td>
-                        <button onclick="editStudent('${id}')">Edit</button>
-                        <button onclick="deleteStudent('${id}')">Delete</button>
-                    </td>
-                `;
-                studentTableBody.appendChild(row);
-            }
-        }
-
-        function populateResults() {
-            const resultSummary = document.getElementById('result-summary');
-            const totalSubjects = document.getElementById('total-subjects');
-            const averageGrade = document.getElementById('average-grade');
-            const wholeAverage = document.getElementById('whole-average');
-            const resultsSection = document.getElementById('results-section');
-            resultSummary.innerHTML = '';
-            resultsSection.innerHTML = '';
-
-            const selectedId = document.getElementById('student-select').value;
-            if (selectedId && students[selectedId]) {
-                const student = students[selectedId];
-                const subjects = Object.entries(student.subjects);
-                animateCount(totalSubjects, subjects.length);
-                averageGrade.textContent = student.averageGrade; // Show stored average grade
-                wholeAverage.textContent = calculateWholeAverage(subjects); // Use existing function
-
-                subjects.forEach(([subject, grade]) => {
-                    const resultCard = document.createElement('div');
-                    resultCard.className = 'result-card';
-                    resultCard.innerHTML = `<strong>${subject}</strong>: ${grade}`;
-                    resultsSection.appendChild(resultCard);
-                });
-            }
-        }
-
-        document.getElementById('student-select').addEventListener('change', function () {
-            populateResults();
-        });
-
-        function populateStudentSelect() {
-            const studentSelect = document.getElementById('student-select');
-            studentSelect.innerHTML = '<option value="" disabled selected>Select a student</option>';
-            for (const id in students) {
-                const option = document.createElement('option');
-                option.value = id;
-                option.textContent = students[id].name;
-                studentSelect.appendChild(option);
-            }
-        }
-
-        function clearForm() {
-            document.getElementById('studentForm').reset();
-            document.getElementById('studentId').value = '';
-            const subjectContainer = document.getElementById('subject-container');
-            subjectContainer.innerHTML = '<div class="subject-entry"><label for="subject">Subject:</label><input type="text" class="subject" required><label for="grade">Grade:</label><input type="text" class="grade" required><button type="button" class="remove-subject" onclick="removeSubject(this)">Remove Subject</button></div>';
-        }
-
-        function addSubject() {
-            const subjectContainer = document.getElementById('subject-container');
-            const newSubjectEntry = document.createElement('div');
-            newSubjectEntry.className = 'subject-entry';
-            newSubjectEntry.innerHTML = `
-                <label for="subject">Subject:</label>
-                <input type="text" class="subject" required>
-                <label for="grade">Grade:</label>
-                <input type="text" class="grade" required>
-                <button type="button" class="remove-subject" onclick="removeSubject(this)">Remove Subject</button>
-            `;
-            subjectContainer.appendChild(newSubjectEntry);
-        }
-
-        function removeSubject(button) {
-            const subjectEntry = button.parentElement;
-            subjectEntry.remove();
-        }
-
-        function editStudent(id) {
-            const student = students[id];
-            document.getElementById('studentId').value = id;
-            document.getElementById('studentName').value = student.name;
-
-            const subjectContainer = document.getElementById('subject-container');
-            subjectContainer.innerHTML = '';
-            for (const [subject, grade] of Object.entries(student.subjects)) {
-                const subjectEntry = document.createElement('div');
-                subjectEntry.className = 'subject-entry';
-                subjectEntry.innerHTML = `
-                    <label for="subject">Subject:</label>
-                    <input type="text" class="subject" value="${subject}" required>
-                    <label for="grade">Grade:</label>
-                    <input type="text" class="grade" value="${grade}" required>
-                    <button type="button" class="remove-subject" onclick="removeSubject(this)">Remove Subject</button>
-                `;
-                subjectContainer.appendChild(subjectEntry);
-            }
-        }
-
-        function deleteStudent(id) {
-            delete students[id];
-            localStorage.setItem('students', JSON.stringify(students));
-            populateStudentSelect();
-            renderStudentTable();
-            clearForm();
-        }
-
-        function filterStudents() {
-            const searchTerm = document.getElementById('search').value.toLowerCase();
-            const filteredStudents = Object.keys(students).filter(id => students[id].name.toLowerCase().includes(searchTerm));
-            const studentTableBody = document.querySelector('#studentTable tbody');
-            studentTableBody.innerHTML = '';
-
-            filteredStudents.forEach(id => {
-                const student = students[id];
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${student.name}</td>
-                    <td>${Object.keys(student.subjects).join(', ')}</td>
-                    <td>${student.averageGrade}</td>
-                    <td>
-                        <button onclick="editStudent('${id}')">Edit</button>
-                        <button onclick="deleteStudent('${id}')">Delete</button>
-                    </td>
-                `;
-                studentTableBody.appendChild(row);
-            });
-        }
-
-        // Dark mode functionality
-        document.getElementById('darkModeToggle').addEventListener('click', function () {
-            document.body.classList.toggle('dark-mode');
-            document.querySelector('.sidebar').classList.toggle('dark-mode');
-            const darkModeText = document.body.classList.contains('dark-mode') ? 'Disable Dark Mode' : 'Enable Dark Mode';
-            this.textContent = darkModeText;
-        });
-
-        // Populate the student dropdown on page load
-        window.onload = function () {
-            populateStudentSelect();
-            renderStudentTable();
-        };
-    </script>
+    <script src="script.js"></script>
 </body>
 
 </html>

@@ -32,7 +32,8 @@
 
         .back-button,
         .sort-button,
-        .export-button {
+        .export-button,
+        .delete-button {
             margin-top: 20px;
             padding: 10px 20px;
             background-color: #1e90ff;
@@ -48,7 +49,8 @@
 
         .back-button:hover,
         .sort-button:hover,
-        .export-button:hover {
+        .export-button:hover,
+        .delete-button:hover {
             background-color: #1c86ee;
         }
 
@@ -69,7 +71,6 @@
             margin: auto;
         }
     </style>
-    <!-- Include jsPDF, docx library, and Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.1.0/docx.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -78,10 +79,9 @@
 <body>
     <h2>Student Results</h2>
 
-    <!-- Sort and Export Buttons -->
     <button class="sort-button" onclick="sortStudents('asc')">Sort by Grades Ascending</button>
     <button class="sort-button" onclick="sortStudents('desc')">Sort by Grades Descending</button>
-    
+
     <select id="exportSelect" class="export-button" onchange="toggleDownloadButton()">
         <option value="">Select Export Format</option>
         <option value="excel">Export to Excel</option>
@@ -98,6 +98,7 @@
                 <th>Subjects</th>
                 <th>Grades</th>
                 <th>Average Grade</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -105,16 +106,13 @@
         </tbody>
     </table>
 
-    <!-- Chart Container -->
     <div id="chartContainer">
         <canvas id="subjectChart"></canvas>
     </div>
 
     <script>
-        // Fetch student data from localStorage
         const students = JSON.parse(localStorage.getItem('students')) || {};
 
-        // Function to convert grades into a numerical value for sorting
         function gradeToNumber(grade) {
             const gradeMapping = {
                 "A+": 4.3,
@@ -133,18 +131,95 @@
             return gradeMapping[grade] || 0;
         }
 
-        // Function to calculate the average grade for a student
         function calculateAverageGrade(subjects) {
             const grades = Object.values(subjects);
             const totalGrade = grades.reduce((sum, grade) => sum + gradeToNumber(grade), 0);
-            return grades.length ? (totalGrade / grades.length).toFixed(2) : 0; // Avoid division by zero
+            return grades.length ? (totalGrade / grades.length).toFixed(2) : 0;
         }
 
-        // Function to calculate average grades for each subject
+        function renderResultsTable() {
+            const resultsTableBody = document.querySelector('#resultsTable tbody');
+            resultsTableBody.innerHTML = '';
+
+            for (const studentId in students) {
+                const student = students[studentId];
+                const subjectsWithGrades = Object.keys(student.subjects)
+                    .map(subject => `${subject}: ${student.subjects[subject]}`)
+                    .join(', ');
+
+                const avgGrade = calculateAverageGrade(student.subjects);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${Object.keys(student.subjects).join(', ')}</td>
+                    <td>${subjectsWithGrades}</td>
+                    <td>${avgGrade}</td>
+                    <td><button class="delete-button" onclick="deleteStudent('${studentId}')">Delete</button></td>
+                `;
+                resultsTableBody.appendChild(row);
+            }
+
+            updateChart();
+        }
+
+        function deleteStudent(studentId) {
+            delete students[studentId];
+            localStorage.setItem('students', JSON.stringify(students));
+            renderResultsTable();
+        }
+
+        function sortStudents(order) {
+            const sortedStudents = Object.values(students).sort((a, b) => {
+                const avgA = calculateAverageGrade(a.subjects);
+                const avgB = calculateAverageGrade(b.subjects);
+                return order === 'asc' ? avgA - avgB : avgB - avgA;
+            });
+            renderResultsTable(sortedStudents);
+        }
+
+        function toggleDownloadButton() {
+            const exportFormat = document.getElementById('exportSelect').value;
+            const downloadButton = document.getElementById('downloadButton');
+            downloadButton.classList.toggle('hidden', !exportFormat);
+        }
+
+        function exportData() {
+            const exportFormat = document.getElementById('exportSelect').value;
+            if (exportFormat === 'excel') {
+                exportToExcel();
+            } else {
+                alert("Please select a valid export format.");
+            }
+            document.getElementById('exportSelect').value = '';
+            toggleDownloadButton();
+        }
+
+        function exportToExcel() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Name,Subjects,Grades,Average Grade\n";
+
+            Object.values(students).forEach(student => {
+                const subjectsWithGrades = Object.keys(student.subjects)
+                    .map(subject => `${subject}: ${student.subjects[subject]}`)
+                    .join(', ');
+                const avgGrade = calculateAverageGrade(student.subjects);
+                const row = `${student.name},"${Object.keys(student.subjects).join(', ')}","${subjectsWithGrades}","${avgGrade}"\n`;
+                csvContent += row;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "student_results.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         function calculateSubjectAverages() {
             const subjectTotals = {};
             const subjectCounts = {};
-
             for (const student of Object.values(students)) {
                 for (const [subject, grade] of Object.entries(student.subjects)) {
                     if (!subjectTotals[subject]) {
@@ -160,108 +235,16 @@
             for (const subject in subjectTotals) {
                 averages[subject] = (subjectTotals[subject] / subjectCounts[subject]).toFixed(2);
             }
-
             return averages;
         }
 
-        // Function to render the results table
-        function renderResultsTable(sortedStudents) {
-            const resultsTableBody = document.querySelector('#resultsTable tbody');
-            resultsTableBody.innerHTML = '';
-
-            for (const student of sortedStudents) {
-                const subjectsWithGrades = Object.keys(student.subjects)
-                    .map(subject => `${subject}: ${student.subjects[subject]}`)
-                    .join(', ');
-
-                const avgGrade = calculateAverageGrade(student.subjects); // Calculate average grade
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${student.name}</td>
-                    <td>${Object.keys(student.subjects).join(', ')}</td>
-                    <td>${subjectsWithGrades}</td>
-                    <td>${avgGrade}</td>
-                `;
-                resultsTableBody.appendChild(row);
-            }
-
-            // Update the chart after rendering the table
-            updateChart();
-        }
-
-        // Function to sort students based on their average grades
-        function sortStudentsByGrades(students, ascending) {
-            return Object.values(students).sort((a, b) => {
-                const avgA = calculateAverageGrade(a.subjects);
-                const avgB = calculateAverageGrade(b.subjects);
-                return ascending ? avgA - avgB : avgB - avgA;
-            });
-        }
-
-        // Function to sort students based on the specified order
-        function sortStudents(order) {
-            const sortedStudents = sortStudentsByGrades(students, order === 'asc');
-            renderResultsTable(sortedStudents);
-        }
-
-        // Function to enable the download button based on selected format
-        function toggleDownloadButton() {
-            const exportFormat = document.getElementById('exportSelect').value;
-            const downloadButton = document.getElementById('downloadButton');
-            downloadButton.classList.toggle('hidden', !exportFormat); // Show or hide button
-        }
-
-        // Function to export results to the selected format
-        function exportData() {
-            const exportFormat = document.getElementById('exportSelect').value;
-            switch (exportFormat) {
-                case 'excel':
-                    exportToExcel();
-                    break;
-                default:
-                    alert("Please select a valid export format.");
-            }
-            document.getElementById('exportSelect').value = ''; // Reset the select
-            toggleDownloadButton(); // Hide the button after download
-        }
-
-        // Function to export results to an Excel file
-        function exportToExcel() {
-            const sortedStudents = sortStudentsByGrades(students, true); // Sort ascending for export
-            let csvContent = "data:text/csv;charset=utf-8,";
-
-            // Create CSV headers
-            csvContent += "Name,Subjects,Grades,Average Grade\n";
-
-            // Create CSV rows
-            sortedStudents.forEach(student => {
-                const subjectsWithGrades = Object.keys(student.subjects)
-                    .map(subject => `${subject}: ${student.subjects[subject]}`)
-                    .join(', ');
-                const avgGrade = calculateAverageGrade(student.subjects);
-                const row = `${student.name},"${Object.keys(student.subjects).join(', ')}","${subjectsWithGrades}","${avgGrade}"\n`;
-                csvContent += row;
-            });
-
-            // Create a downloadable link and click it
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "student_results.csv");
-            document.body.appendChild(link); // Required for FF
-            link.click();
-            document.body.removeChild(link); // Clean up
-        }
-
-        // Function to update the chart with subject averages
         function updateChart() {
             const subjectAverages = calculateSubjectAverages();
             const labels = Object.keys(subjectAverages);
             const data = Object.values(subjectAverages);
 
             const ctx = document.getElementById('subjectChart').getContext('2d');
-            const chart = new Chart(ctx, {
+            new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -277,20 +260,13 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value; // Adjust according to your grading system
-                                }
-                            }
                         }
                     }
                 }
             });
         }
 
-        // Initial rendering of the table
-        const sortedStudents = sortStudentsByGrades(students, true);
-        renderResultsTable(sortedStudents);
+        renderResultsTable();
     </script>
 </body>
 
