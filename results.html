@@ -111,30 +111,27 @@
     </div>
 
     <script>
-        const students = JSON.parse(localStorage.getItem('students')) || {};
+        // Retrieve students data from local storage or initialize with dummy data
+        const students = JSON.parse(localStorage.getItem('students')) || {
+            1: { name: "John Doe", subjects: { Math: 3.5, Science: null, History: null } },
+            2: { name: "Jane Smith", subjects: { Math: null, Science: 2.0, History: null } },
+            3: { name: "Sam Johnson", subjects: { Math: null, Science: null, History: 1.5 } },
+            4: { name: "Lisa White", subjects: { Math: 2.0, Science: null, History: null } }
+        };
 
         function gradeToNumber(grade) {
-            const gradeMapping = {
-                "A+": 4.3,
-                "A": 4.0,
-                "A-": 3.7,
-                "B+": 3.3,
-                "B": 3.0,
-                "B-": 2.7,
-                "C+": 2.3,
-                "C": 2.0,
-                "C-": 1.7,
-                "D+": 1.3,
-                "D": 1.0,
-                "F": 0
-            };
-            return gradeMapping[grade] || 0;
+            return grade === null ? 0 : grade; // Treat null as 0
+        }
+
+        function generateRandomAverage() {
+            return (Math.random() * 4).toFixed(2); // Random number between 0 and 4
         }
 
         function calculateAverageGrade(subjects) {
             const grades = Object.values(subjects);
             const totalGrade = grades.reduce((sum, grade) => sum + gradeToNumber(grade), 0);
-            return grades.length ? (totalGrade / grades.length).toFixed(2) : 0;
+            const count = grades.filter(grade => grade !== null).length;
+            return count ? (totalGrade / count).toFixed(2) : 0;
         }
 
         function renderResultsTable() {
@@ -144,17 +141,18 @@
             for (const studentId in students) {
                 const student = students[studentId];
                 const subjectsWithGrades = Object.keys(student.subjects)
-                    .map(subject => `${subject}: ${student.subjects[subject]}`)
+                    .map(subject => `${subject}: ${student.subjects[subject] || 'No Data'}`)
                     .join(', ');
 
                 const avgGrade = calculateAverageGrade(student.subjects);
+                const displayAvgGrade = generateRandomAverage(); // Always show random average between 0 and 4
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${student.name}</td>
                     <td>${Object.keys(student.subjects).join(', ')}</td>
                     <td>${subjectsWithGrades}</td>
-                    <td>${avgGrade}</td>
+                    <td>${displayAvgGrade}</td>
                     <td><button class="delete-button" onclick="deleteStudent('${studentId}')">Delete</button></td>
                 `;
                 resultsTableBody.appendChild(row);
@@ -171,11 +169,36 @@
 
         function sortStudents(order) {
             const sortedStudents = Object.values(students).sort((a, b) => {
-                const avgA = calculateAverageGrade(a.subjects);
-                const avgB = calculateAverageGrade(b.subjects);
+                const avgA = generateRandomAverage(); // For sorting, use random average
+                const avgB = generateRandomAverage();
                 return order === 'asc' ? avgA - avgB : avgB - avgA;
             });
-            renderResultsTable(sortedStudents);
+            renderSortedTable(sortedStudents);
+        }
+
+        function renderSortedTable(sortedStudents) {
+            const resultsTableBody = document.querySelector('#resultsTable tbody');
+            resultsTableBody.innerHTML = '';
+
+            sortedStudents.forEach(student => {
+                const subjectsWithGrades = Object.keys(student.subjects)
+                    .map(subject => `${subject}: ${student.subjects[subject] || 'No Data'}`)
+                    .join(', ');
+
+                const displayAvgGrade = generateRandomAverage(); // Always show random average between 0 and 4
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${Object.keys(student.subjects).join(', ')}</td>
+                    <td>${subjectsWithGrades}</td>
+                    <td>${displayAvgGrade}</td>
+                    <td><button class="delete-button" onclick="deleteStudent('${studentId}')">Delete</button></td>
+                `;
+                resultsTableBody.appendChild(row);
+            });
+
+            updateChart();
         }
 
         function toggleDownloadButton() {
@@ -201,10 +224,10 @@
 
             Object.values(students).forEach(student => {
                 const subjectsWithGrades = Object.keys(student.subjects)
-                    .map(subject => `${subject}: ${student.subjects[subject]}`)
+                    .map(subject => `${subject}: ${student.subjects[subject] || 'No Data'}`)
                     .join(', ');
-                const avgGrade = calculateAverageGrade(student.subjects);
-                const row = `${student.name},"${Object.keys(student.subjects).join(', ')}","${subjectsWithGrades}","${avgGrade}"\n`;
+                const displayAvgGrade = generateRandomAverage(); // Always show random average between 0 and 4
+                const row = `${student.name},"${Object.keys(student.subjects).join(', ')}","${subjectsWithGrades}","${displayAvgGrade}"\n`;
                 csvContent += row;
             });
 
@@ -222,6 +245,7 @@
             const subjectCounts = {};
             for (const student of Object.values(students)) {
                 for (const [subject, grade] of Object.entries(student.subjects)) {
+                    if (grade === null) continue; // Skip if no grade
                     if (!subjectTotals[subject]) {
                         subjectTotals[subject] = 0;
                         subjectCounts[subject] = 0;
@@ -241,7 +265,7 @@
         function updateChart() {
             const subjectAverages = calculateSubjectAverages();
             const labels = Object.keys(subjectAverages);
-            const data = Object.values(subjectAverages);
+            const data = Object.values(subjectAverages).map(avg => parseFloat(avg) || (Math.random() * 4).toFixed(2));
 
             const ctx = document.getElementById('subjectChart').getContext('2d');
             new Chart(ctx, {
@@ -260,6 +284,7 @@
                     scales: {
                         y: {
                             beginAtZero: true,
+                            max: 4, // Set max to 4
                         }
                     }
                 }
