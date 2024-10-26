@@ -61,10 +61,18 @@
         .hidden {
             display: none;
         }
+
+        #chartContainer {
+            margin-top: 40px;
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+        }
     </style>
-    <!-- Include jsPDF and docx library -->
+    <!-- Include jsPDF, docx library, and Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.1.0/docx.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -77,8 +85,6 @@
     <select id="exportSelect" class="export-button" onchange="toggleDownloadButton()">
         <option value="">Select Export Format</option>
         <option value="excel">Export to Excel</option>
-        <!-- <option value="pdf">Export to PDF</option> -->
-        <!-- <option value="word">Export to Word</option> -->
     </select>
 
     <button id="downloadButton" class="export-button hidden" onclick="exportData()">Download</button>
@@ -91,12 +97,18 @@
                 <th>Name</th>
                 <th>Subjects</th>
                 <th>Grades</th>
+                <th>Average Grade</th>
             </tr>
         </thead>
         <tbody>
             <!-- Student data will be populated here -->
         </tbody>
     </table>
+
+    <!-- Chart Container -->
+    <div id="chartContainer">
+        <canvas id="subjectChart"></canvas>
+    </div>
 
     <script>
         // Fetch student data from localStorage
@@ -125,7 +137,31 @@
         function calculateAverageGrade(subjects) {
             const grades = Object.values(subjects);
             const totalGrade = grades.reduce((sum, grade) => sum + gradeToNumber(grade), 0);
-            return grades.length ? (totalGrade / grades.length) : 0; // Avoid division by zero
+            return grades.length ? (totalGrade / grades.length).toFixed(2) : 0; // Avoid division by zero
+        }
+
+        // Function to calculate average grades for each subject
+        function calculateSubjectAverages() {
+            const subjectTotals = {};
+            const subjectCounts = {};
+
+            for (const student of Object.values(students)) {
+                for (const [subject, grade] of Object.entries(student.subjects)) {
+                    if (!subjectTotals[subject]) {
+                        subjectTotals[subject] = 0;
+                        subjectCounts[subject] = 0;
+                    }
+                    subjectTotals[subject] += gradeToNumber(grade);
+                    subjectCounts[subject] += 1;
+                }
+            }
+
+            const averages = {};
+            for (const subject in subjectTotals) {
+                averages[subject] = (subjectTotals[subject] / subjectCounts[subject]).toFixed(2);
+            }
+
+            return averages;
         }
 
         // Function to render the results table
@@ -138,14 +174,20 @@
                     .map(subject => `${subject}: ${student.subjects[subject]}`)
                     .join(', ');
 
+                const avgGrade = calculateAverageGrade(student.subjects); // Calculate average grade
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${student.name}</td>
                     <td>${Object.keys(student.subjects).join(', ')}</td>
                     <td>${subjectsWithGrades}</td>
+                    <td>${avgGrade}</td>
                 `;
                 resultsTableBody.appendChild(row);
             }
+
+            // Update the chart after rendering the table
+            updateChart();
         }
 
         // Function to sort students based on their average grades
@@ -177,12 +219,6 @@
                 case 'excel':
                     exportToExcel();
                     break;
-                case 'pdf':
-                    exportToPDF();
-                    break;
-                case 'word':
-                    exportToWord();
-                    break;
                 default:
                     alert("Please select a valid export format.");
             }
@@ -196,14 +232,15 @@
             let csvContent = "data:text/csv;charset=utf-8,";
 
             // Create CSV headers
-            csvContent += "Name,Subjects,Grades\n";
+            csvContent += "Name,Subjects,Grades,Average Grade\n";
 
             // Create CSV rows
             sortedStudents.forEach(student => {
                 const subjectsWithGrades = Object.keys(student.subjects)
                     .map(subject => `${subject}: ${student.subjects[subject]}`)
                     .join(', ');
-                const row = `${student.name},"${Object.keys(student.subjects).join(', ')}","${subjectsWithGrades}"\n`;
+                const avgGrade = calculateAverageGrade(student.subjects);
+                const row = `${student.name},"${Object.keys(student.subjects).join(', ')}","${subjectsWithGrades}","${avgGrade}"\n`;
                 csvContent += row;
             });
 
@@ -217,79 +254,37 @@
             document.body.removeChild(link); // Clean up
         }
 
-        // Function to export results to a PDF file
-        function exportToPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+        // Function to update the chart with subject averages
+        function updateChart() {
+            const subjectAverages = calculateSubjectAverages();
+            const labels = Object.keys(subjectAverages);
+            const data = Object.values(subjectAverages);
 
-            // Add title
-            doc.text("Student Results", 14, 16);
-            doc.setFontSize(12);
-
-            // Create PDF headers
-            const headers = ["Name", "Subjects", "Grades"];
-            const rows = [];
-
-            // Prepare data for PDF
-            const sortedStudents = sortStudentsByGrades(students, true);
-            sortedStudents.forEach(student => {
-                const subjectsWithGrades = Object.keys(student.subjects)
-                    .map(subject => `${subject}: ${student.subjects[subject]}`)
-                    .join(', ');
-                rows.push([student.name, Object.keys(student.subjects).join(', '), subjectsWithGrades]);
-            });
-
-            // Add table to PDF
-            doc.autoTable({
-                head: [headers],
-                body: rows,
-            });
-
-            // Save the PDF
-            doc.save("student_results.pdf");
-        }
-
-        // Function to export results to a Word file
-        function exportToWord() {
-            const { Document, Packer, Paragraph, TextRun } = window.docx;
-            const doc = new Document();
-
-            // Create a title
-            doc.addSection({
-                properties: {},
-                children: [
-                    new Paragraph({
-                        children: [
-                            new TextRun("Student Results"),
-                        ],
-                    }),
-                ],
-            });
-
-            // Prepare data for Word
-            const sortedStudents = sortStudentsByGrades(students, true);
-            sortedStudents.forEach(student => {
-                const subjectsWithGrades = Object.keys(student.subjects)
-                    .map(subject => `${subject}: ${student.subjects[subject]}`)
-                    .join(', ');
-                doc.addSection({
-                    children: [
-                        new Paragraph(`Name: ${student.name}`),
-                        new Paragraph(`Subjects: ${Object.keys(student.subjects).join(', ')}`),
-                        new Paragraph(`Grades: ${subjectsWithGrades}`),
-                        new Paragraph(""), // Add a blank line
-                    ],
-                });
-            });
-
-            // Save the Word file
-            Packer.toBlob(doc).then(blob => {
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = "student_results.docx";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+            const ctx = document.getElementById('subjectChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Grade by Subject',
+                        data: data,
+                        backgroundColor: 'rgba(30, 144, 255, 0.5)',
+                        borderColor: 'rgba(30, 144, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value; // Adjust according to your grading system
+                                }
+                            }
+                        }
+                    }
+                }
             });
         }
 

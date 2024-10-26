@@ -309,43 +309,75 @@
                 <tr>
                     <th>Name</th>
                     <th>Subjects</th>
+                    <th>Average Grade</th> <!-- Added Average Grade Column -->
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Student rows dynamically populated -->
+                <!-- Student entries dynamically populated -->
             </tbody>
         </table>
     </div>
 
     <script>
-        const students = JSON.parse(localStorage.getItem('students')) || {};
-        const dummyData = {
-            '1': { name: 'John Doe', subjects: { 'Math': 'A', 'Science': 'B' } },
-            '2': { name: 'Jane Smith', subjects: { 'English': 'B', 'History': 'A' } },
-            '3': { name: 'Alice Johnson', subjects: { 'Math': 'C', 'Biology': 'A' } },
-            '4': { name: 'Bob Brown', subjects: { 'Chemistry': 'B', 'Physics': 'B' } },
-            '5': { name: 'Charlie Davis', subjects: { 'Geography': 'A', 'Art': 'C' } }
-        };
+        // Initializing students from localStorage
+        let students = JSON.parse(localStorage.getItem('students')) || {};
 
-        function initializeDummyData() {
-            if (Object.keys(students).length === 0) {
-                Object.keys(dummyData).forEach(id => {
-                    students[id] = dummyData[id];
-                });
-                localStorage.setItem('students', JSON.stringify(students));
-            }
+        function calculateAverageGrade(subjects) {
+            const grades = subjects.map(([_, grade]) => grade);
+            const gradePoints = {
+                'A': 4,
+                'B': 3,
+                'C': 2,
+                'D': 1,
+                'F': 0
+            };
+
+            const totalPoints = grades.reduce((sum, grade) => sum + (gradePoints[grade] || 0), 0);
+            return grades.length > 0 ? (totalPoints / grades.length).toFixed(2) : '0.00';
         }
 
-        function populateStudentSelect() {
-            const studentSelect = document.getElementById('student-select');
-            studentSelect.innerHTML = '<option value="" disabled selected>Select a student</option>'; // Clear existing options
+        document.getElementById('studentForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const studentId = document.getElementById('studentId').value || Date.now().toString();
+            const studentName = document.getElementById('studentName').value;
+            const subjects = {};
+            const subjectElements = document.querySelectorAll('.subject');
+            const gradeElements = document.querySelectorAll('.grade');
+
+            subjectElements.forEach((subjectEl, index) => {
+                const subject = subjectEl.value;
+                const grade = gradeElements[index].value;
+                subjects[subject] = grade;
+            });
+
+            const averageGrade = calculateAverageGrade(Object.entries(subjects));
+            students[studentId] = { name: studentName, subjects, averageGrade };
+            
+            localStorage.setItem('students', JSON.stringify(students));
+            populateStudentSelect();
+            populateResults();
+            clearForm();
+            renderStudentTable();
+        });
+
+        function renderStudentTable() {
+            const studentTableBody = document.querySelector('#studentTable tbody');
+            studentTableBody.innerHTML = '';
 
             for (const id in students) {
-                const option = document.createElement('option');
-                option.value = id;
-                option.textContent = students[id].name;
-                studentSelect.appendChild(option);
+                const student = students[id];
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${Object.keys(student.subjects).join(', ')}</td>
+                    <td>${student.averageGrade}</td> <!-- Displaying average grade -->
+                    <td>
+                        <button onclick="editStudent('${id}')">Edit</button>
+                        <button onclick="deleteStudent('${id}')">Delete</button>
+                    </td>
+                `;
+                studentTableBody.appendChild(row);
             }
         }
 
@@ -363,8 +395,8 @@
                 const student = students[selectedId];
                 const subjects = Object.entries(student.subjects);
                 animateCount(totalSubjects, subjects.length);
-                averageGrade.textContent = calculateAverageGrade(subjects);
-                wholeAverage.textContent = calculateWholeAverage(subjects);
+                averageGrade.textContent = student.averageGrade; // Show stored average grade
+                wholeAverage.textContent = calculateWholeAverage(subjects); // Use existing function
 
                 subjects.forEach(([subject, grade]) => {
                     const resultCard = document.createElement('div');
@@ -375,136 +407,66 @@
             }
         }
 
-        function animateCount(element, target) {
-            const start = parseInt(element.textContent, 10);
-            const end = target;
-            const duration = 1000; // 1 second
-            const stepTime = Math.abs(Math.floor(duration / (end - start)));
-
-            let current = start;
-            const increment = end > start ? 1 : -1;
-
-            const step = () => {
-                current += increment;
-                element.textContent = current;
-                if (current !== end) {
-                    setTimeout(step, stepTime);
-                }
-            };
-            step();
-        }
-
-        function calculateAverageGrade(subjects) {
-            const grades = subjects.map(([_, grade]) => grade);
-            const gradePoints = {
-                'A': 4,
-                'B': 3,
-                'C': 2,
-                'D': 1,
-                'F': 0
-            };
-
-            const totalPoints = grades.reduce((sum, grade) => sum + (gradePoints[grade] || 0), 0);
-            return (totalPoints / grades.length).toFixed(2);
-        }
-
-        function calculateWholeAverage(subjects) {
-            const grades = subjects.map(([_, grade]) => grade);
-            const gradePoints = {
-                'A': 4,
-                'B': 3,
-                'C': 2,
-                'D': 1,
-                'F': 0
-            };
-
-            const totalPoints = grades.reduce((sum, grade) => sum + (gradePoints[grade] || 0), 0);
-            return (totalPoints / grades.length).toFixed(2);
-        }
-
         document.getElementById('student-select').addEventListener('change', function () {
             populateResults();
         });
 
-        document.getElementById('studentForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const studentId = document.getElementById('studentId').value || Date.now().toString();
-            const studentName = document.getElementById('studentName').value;
-            const subjects = {};
-            const subjectElements = document.querySelectorAll('.subject');
-            const gradeElements = document.querySelectorAll('.grade');
-
-            subjectElements.forEach((subjectEl, index) => {
-                const subject = subjectEl.value;
-                const grade = gradeElements[index].value;
-                subjects[subject] = grade;
-            });
-
-            students[studentId] = { name: studentName, subjects };
-            localStorage.setItem('students', JSON.stringify(students));
-            populateStudentSelect();
-            populateResults();
-            clearForm();
-            renderStudentTable();
-        });
-
-        function clearForm() {
-            document.getElementById('studentId').value = '';
-            document.getElementById('studentName').value = '';
-            document.querySelectorAll('.subject').forEach(input => input.value = '');
-            document.querySelectorAll('.grade').forEach(input => input.value = '');
+        function populateStudentSelect() {
+            const studentSelect = document.getElementById('student-select');
+            studentSelect.innerHTML = '<option value="" disabled selected>Select a student</option>';
+            for (const id in students) {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = students[id].name;
+                studentSelect.appendChild(option);
+            }
         }
 
-        function renderStudentTable() {
-            const studentTableBody = document.querySelector('#studentTable tbody');
-            studentTableBody.innerHTML = '';
+        function clearForm() {
+            document.getElementById('studentForm').reset();
+            document.getElementById('studentId').value = '';
+            const subjectContainer = document.getElementById('subject-container');
+            subjectContainer.innerHTML = '<div class="subject-entry"><label for="subject">Subject:</label><input type="text" class="subject" required><label for="grade">Grade:</label><input type="text" class="grade" required><button type="button" class="remove-subject" onclick="removeSubject(this)">Remove Subject</button></div>';
+        }
 
-            for (const id in students) {
-                const student = students[id];
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${student.name}</td>
-                    <td>${Object.keys(student.subjects).join(', ')}</td>
-                    <td>
-                        <button onclick="editStudent('${id}')">Edit</button>
-                        <button onclick="deleteStudent('${id}')">Delete</button>
-                    </td>
-                `;
-                studentTableBody.appendChild(row);
-            }
+        function addSubject() {
+            const subjectContainer = document.getElementById('subject-container');
+            const newSubjectEntry = document.createElement('div');
+            newSubjectEntry.className = 'subject-entry';
+            newSubjectEntry.innerHTML = `
+                <label for="subject">Subject:</label>
+                <input type="text" class="subject" required>
+                <label for="grade">Grade:</label>
+                <input type="text" class="grade" required>
+                <button type="button" class="remove-subject" onclick="removeSubject(this)">Remove Subject</button>
+            `;
+            subjectContainer.appendChild(newSubjectEntry);
+        }
+
+        function removeSubject(button) {
+            const subjectEntry = button.parentElement;
+            subjectEntry.remove();
         }
 
         function editStudent(id) {
             const student = students[id];
             document.getElementById('studentId').value = id;
             document.getElementById('studentName').value = student.name;
-            clearSubjects(); // Clear existing subjects
-            Object.entries(student.subjects).forEach(([subject, grade]) => {
-                addSubject(subject, grade);
-            });
-            renderStudentTable();
-        }
 
-        function clearSubjects() {
-            document.querySelectorAll('.subject-entry').forEach(subjectEntry => subjectEntry.remove());
-        }
-
-        function addSubject(subject = '', grade = '') {
             const subjectContainer = document.getElementById('subject-container');
-            const subjectEntry = document.createElement('div');
-            subjectEntry.className = 'subject-entry';
-            subjectEntry.innerHTML = `
-                <label for="subject">Subject:</label>
-                <input type="text" class="subject" value="${subject}" required>
-                <label for="grade">Grade:</label>
-                <input type="text" class="grade" value="${grade}" required>
-                <button type="button" class="remove-subject" onclick="removeSubject(this)">Remove Subject</button>
-            `;
-            subjectContainer.appendChild(subjectEntry);
-        }
-
-        function removeSubject(button) {
-            button.parentElement.remove();
+            subjectContainer.innerHTML = '';
+            for (const [subject, grade] of Object.entries(student.subjects)) {
+                const subjectEntry = document.createElement('div');
+                subjectEntry.className = 'subject-entry';
+                subjectEntry.innerHTML = `
+                    <label for="subject">Subject:</label>
+                    <input type="text" class="subject" value="${subject}" required>
+                    <label for="grade">Grade:</label>
+                    <input type="text" class="grade" value="${grade}" required>
+                    <button type="button" class="remove-subject" onclick="removeSubject(this)">Remove Subject</button>
+                `;
+                subjectContainer.appendChild(subjectEntry);
+            }
         }
 
         function deleteStudent(id) {
@@ -512,40 +474,44 @@
             localStorage.setItem('students', JSON.stringify(students));
             populateStudentSelect();
             renderStudentTable();
-            populateResults();
+            clearForm();
         }
 
         function filterStudents() {
-            const query = document.getElementById('search').value.toLowerCase();
-            const filteredStudents = Object.keys(students).filter(id => students[id].name.toLowerCase().includes(query));
-            const studentSelect = document.getElementById('student-select');
-            studentSelect.innerHTML = '<option value="" disabled selected>Select a student</option>'; // Clear existing options
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const filteredStudents = Object.keys(students).filter(id => students[id].name.toLowerCase().includes(searchTerm));
+            const studentTableBody = document.querySelector('#studentTable tbody');
+            studentTableBody.innerHTML = '';
 
             filteredStudents.forEach(id => {
-                const option = document.createElement('option');
-                option.value = id;
-                option.textContent = students[id].name;
-                studentSelect.appendChild(option);
+                const student = students[id];
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${Object.keys(student.subjects).join(', ')}</td>
+                    <td>${student.averageGrade}</td>
+                    <td>
+                        <button onclick="editStudent('${id}')">Edit</button>
+                        <button onclick="deleteStudent('${id}')">Delete</button>
+                    </td>
+                `;
+                studentTableBody.appendChild(row);
             });
         }
 
-        // Dark Mode Toggle
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        darkModeToggle.addEventListener('click', function () {
+        // Dark mode functionality
+        document.getElementById('darkModeToggle').addEventListener('click', function () {
             document.body.classList.toggle('dark-mode');
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('dark-mode');
-            const resultCards = document.querySelectorAll('.result-card');
-            resultCards.forEach(card => card.classList.toggle('dark-mode'));
-            const resultSummary = document.querySelectorAll('.result-summary div');
-            resultSummary.forEach(summary => summary.classList.toggle('dark-mode'));
-            darkModeToggle.textContent = darkModeToggle.textContent.includes('Enable') ? 'Disable Dark Mode' : 'Enable Dark Mode';
+            document.querySelector('.sidebar').classList.toggle('dark-mode');
+            const darkModeText = document.body.classList.contains('dark-mode') ? 'Disable Dark Mode' : 'Enable Dark Mode';
+            this.textContent = darkModeText;
         });
 
-        // Initialize the app
-        initializeDummyData();
-        populateStudentSelect();
-        renderStudentTable();
+        // Populate the student dropdown on page load
+        window.onload = function () {
+            populateStudentSelect();
+            renderStudentTable();
+        };
     </script>
 </body>
 
