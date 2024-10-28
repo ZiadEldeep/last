@@ -1,0 +1,79 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f7fa; /* Light background color */
+}
+
+h3 {
+    text-align: center;
+    color: #333; /* Darker text for contrast */
+}
+
+.controls {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px; /* Rounded corners for buttons */
+    background-color: #007bff; /* Primary button color */
+    color: white; /* Button text color */
+    cursor: pointer;
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+}
+
+td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    position: relative;
+    text-align: center;
+    vertical-align: middle;
+    background-color: #ffffff; /* White background for cells */
+    transition: background-color 0.3s; /* Smooth transition for cell background */
+}
+
+td:hover {
+    background-color: #f1f1f1; /* Light gray on hover */
+}
+
+.cell-checkbox {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.selected {
+    background-color: #d1e7dd; /* Light green for selected cells */
+}
+
+/* Styling for the color picker */
+input[type="color"] {
+    border: none;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+/* Styling for the font size select */
+select {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}

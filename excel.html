@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel-degrees</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script> <!-- Include SheetJS -->
+    <style>
+        /* Basic styles for the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        td[contentEditable="true"]:focus {
+            outline: 2px solid #007BFF; /* Blue outline on focus */
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .dark-mode th {
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+        .dark-mode td {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border-color: #444;
+        }
+        .dark-mode .controls button {
+            background-color: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+        }
+    </style>
+</head>
+<body>
+    <h3>كشف الدرجات</h3>
+
+    <!-- University Name Section -->
+    <div class="university-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <div id="universityNameEn" style="font-weight: 600;">Jazan University</div>
+        <div id="universityNameAr" style="direction: rtl; font-weight: 600;">جامعة جازان</div>
+    </div>
+
+    <!-- Date Section -->
+    <div class="date-container" style="display: flex; justify-content: space-between; align-items: center;">
+        <div id="englishDate" style="font-weight: 600;"></div>
+        <div id="arabicDate" style="direction: rtl; font-weight: 600;"></div>
+    </div>
+
+    <!-- Logo Section -->
+    <div class="logo-container" style="text-align: center; margin-bottom: 20px;">
+        <img src="images/jazan.png" alt="Logo" style="width: 150px; height: auto; border-radius: 50%;" />
+    </div>
+
+    <div class="controls">
+        <button id="addRow">Add Row</button>
+        <button id="addCol">Add Column</button>
+        <button id="deleteRow">Delete Row</button>
+        <button id="deleteCol">Delete Column</button>
+        <button id="bold">Bold</button>
+        <button id="italic">Italic</button>
+        <label for="bgColorPicker">Background Color:</label>
+        <input type="color" id="bgColorPicker">
+        <label for="fontColorPicker">Font Color:</label>
+        <input type="color" id="fontColorPicker">
+        <label for="fontSizePicker">Font Size:</label>
+        <select id="fontSizePicker">
+            <option value="12px">12</option>
+            <option value="14px">14</option>
+            <option value="16px">16</option>
+            <option value="18px">18</option>
+            <option value="20px">20</option>
+            <option value="24px">24</option>
+            <option value="28px">28</option>
+            <option value="32px">32</option>
+        </select>
+        <button id="toggleDarkMode">Toggle Dark Mode</button> <!-- Dark mode toggle button -->
+        <button id="downloadExcel">Download as Excel</button> <!-- Download Excel button -->
+    </div>
+    
+    <table id="excelTable" tabindex="0">
+        <thead>
+            <tr>
+                <th contentEditable="true"><input type="checkbox" class="cell-checkbox">3</th>
+                <th contentEditable="true"><input type="checkbox" class="cell-checkbox">:عدد الساعات</th>
+                <th contentEditable="true"><input type="checkbox" class="cell-checkbox">0</th>
+                <th contentEditable="true"><input type="checkbox" class="cell-checkbox">:رمز المقرر</th>
+                <th contentEditable="true"><input type="checkbox" class="cell-checkbox">Main Campus</th>
+                <th contentEditable="true"><input type="checkbox" class="cell-checkbox">:المقرر</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td contentEditable="true">0</td>
+                <td contentEditable="true">:رقم الشعبه</td>
+                <td contentEditable="true">0</td>
+                <td contentEditable="true">:اسم المقرر</td>
+                <td contentEditable="true">College of CS & IT</td>
+                <td contentEditable="true">:الكليه</td>
+            </tr>
+            <tr>
+                <td contentEditable="true">بكالريوس</td>
+                <td contentEditable="true">:الدرجه</td>
+                <td contentEditable="true">0</td>
+                <td contentEditable="true">:استاذ المقرر</td>
+                <td contentEditable="true">IT & Security</td>
+                <td contentEditable="true">:القسم</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <script src="excelscript.js"></script>
+    <script>
+        // Function to get current date and display it
+        function displayDate() {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+
+            // Format English date
+            const englishDate = today.toLocaleDateString('en-US', options);
+            document.getElementById('englishDate').textContent = englishDate;
+
+            // Format Arabic date
+            const arabicDate = today.toLocaleDateString('ar-EG', options);
+            document.getElementById('arabicDate').textContent = arabicDate;
+        }
+
+        // Call displayDate on page load
+        displayDate();
+
+        // Load table data from local storage
+        function loadTableData() {
+            const tableData = JSON.parse(localStorage.getItem('tableData'));
+            if (tableData) {
+                const tbody = document.querySelector('#excelTable tbody');
+                tbody.innerHTML = ''; // Clear existing rows
+
+                tableData.forEach(rowData => {
+                    const row = document.createElement('tr');
+                    rowData.forEach(cellData => {
+                        const cell = document.createElement('td');
+                        cell.contentEditable = 'true';
+                        cell.textContent = cellData; // Set the cell text to the saved data
+                        row.appendChild(cell);
+                    });
+                    tbody.appendChild(row);
+                });
+
+                // Reattach input event listeners to new cells
+                attachCellInputListeners();
+            }
+        }
+
+        // Save table data to local storage
+        function saveTableData() {
+            const rows = document.querySelectorAll('#excelTable tbody tr');
+            const tableData = Array.from(rows).map(row => {
+                return Array.from(row.children).map(cell => cell.textContent);
+            });
+            localStorage.setItem('tableData', JSON.stringify(tableData));
+        }
+
+        // Attach input event listeners to cells
+        function attachCellInputListeners() {
+            document.querySelectorAll('#excelTable td[contentEditable="true"]').forEach(cell => {
+                cell.addEventListener('input', saveTableData);
+            });
+        }
+
+        // Load table data on page load
+        loadTableData();
+
+        // Function to toggle dark mode
+        document.getElementById('toggleDarkMode').addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // Function to download the table data as an Excel file
+        document.getElementById('downloadExcel').addEventListener('click', function () {
+            // Get the table element
+            const table = document.getElementById('excelTable');
+
+            // Create a new workbook and a new worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.table_to_sheet(table);
+
+            // Add the worksheet to the workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+            // Generate a file and download it
+            XLSX.writeFile(wb, 'table_data.xlsx');
+        });
+
+        // Add functionality to add row
+        document.getElementById('addRow').addEventListener('click', function () {
+            const tbody = document.querySelector('#excelTable tbody');
+            const newRow = document.createElement('tr');
+            const columnsCount = document.querySelectorAll('#excelTable thead th').length;
+            for (let i = 0; i < columnsCount; i++) {
+                const newCell = document.createElement('td');
+                newCell.contentEditable = 'true';
+                newRow.appendChild(newCell);
+            }
+            tbody.appendChild(newRow);
+            saveTableData(); // Save updated data
+            attachCellInputListeners(); // Reattach input event listeners
+        });
+
+        // Add functionality to add column
+        document.getElementById('addCol').addEventListener('click', function () {
+            const thead = document.querySelector('#excelTable thead tr');
+            const newTh = document.createElement('th');
+            newTh.contentEditable = 'true'; // Make the new header editable
+            newTh.textContent = 'New Header'; // Default header text
+            thead.appendChild(newTh); // Add new header
+
+            const tbody = document.querySelector('#excelTable tbody');
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const newTd = document.createElement('td');
+                newTd.contentEditable = 'true'; // Make the new cell editable
+                row.appendChild(newTd); // Add new cell to each row
+            });
+            saveTableData(); // Save updated data
+            attachCellInputListeners(); // Reattach input event listeners
+        });
+
+        // Add functionality to delete row
+        document.getElementById('deleteRow').addEventListener('click', function () {
+            const tbody = document.querySelector('#excelTable tbody');
+            const rows = tbody.querySelectorAll('tr');
+            if (rows.length > 0) {
+                tbody.removeChild(rows[rows.length - 1]); // Remove the last row
+                saveTableData(); // Save updated data
+            }
+        });
+
+        // Add functionality to delete column
+        document.getElementById('deleteCol').addEventListener('click', function () {
+            const thead = document.querySelector('#excelTable thead tr');
+            const cells = thead.querySelectorAll('th');
+            if (cells.length > 0) {
+                const lastIndex = cells.length - 1;
+                thead.removeChild(cells[lastIndex]); // Remove the last header cell
+
+                const tbody = document.querySelector('#excelTable tbody');
+                const rows = tbody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length > 0) {
+                        row.removeChild(cells[cells.length - 1]); // Remove the last cell in each row
+                    }
+                });
+                saveTableData(); // Save updated data
+            }
+        });
+
+        // Add functionality for bold
+        document.getElementById('bold').addEventListener('click', function () {
+            document.execCommand('bold');
+        });
+
+        // Add functionality for italic
+        document.getElementById('italic').addEventListener('click', function () {
+            document.execCommand('italic');
+        });
+
+        // Change cell background color
+        document.getElementById('bgColorPicker').addEventListener('input', function () {
+            document.querySelectorAll('#excelTable td[contentEditable="true"]:focus').forEach(cell => {
+                cell.style.backgroundColor = this.value;
+            });
+        });
+
+        // Change cell font color
+        document.getElementById('fontColorPicker').addEventListener('input', function () {
+            document.querySelectorAll('#excelTable td[contentEditable="true"]:focus').forEach(cell => {
+                cell.style.color = this.value;
+            });
+        });
+
+        // Change cell font size
+        document.getElementById('fontSizePicker').addEventListener('change', function () {
+            document.querySelectorAll('#excelTable td[contentEditable="true"]:focus').forEach(cell => {
+                cell.style.fontSize = this.value;
+            });
+        });
+    </script>
+</body>
+</html>
