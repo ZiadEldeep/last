@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grade Calculator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -40,7 +41,7 @@
         }
 
         .content {
-            margin-left: 220px; /* Space for the sidebar */
+            margin-left: 220px;
             padding: 20px;
             width: calc(100% - 220px);
             display: flex;
@@ -55,7 +56,7 @@
             border-radius: 8px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 400px; /* Maximum width for the form */
+            max-width: 400px;
             text-align: center;
             margin-bottom: 20px;
             transition: background-color 0.3s;
@@ -111,7 +112,7 @@
             gap: 5px;
         }
 
-        .edit-button, .delete-button {
+        .edit-button, .delete-button, .download-button {
             padding: 6px 10px;
             border: none;
             border-radius: 5px;
@@ -279,7 +280,7 @@
             }
 
             .form-container {
-                width: calc(100% - 40px); /* Full width minus padding */
+                width: calc(100% - 40px);
             }
         }
     </style>
@@ -292,9 +293,8 @@
         <a href="results.html">View Results</a>
         <a href="degrees.html">Degrees Calculator</a>
         <a href="contact.html">Contact Us</a>
-        <a href="about.html">About Us</a>         
-           <a href="excel.html">Degrees and grades</a>
-
+        <a href="about.html">About Us</a>
+        <a href="excel.html">Degrees and grades</a>
     </div>
 
     <div class="content">
@@ -329,6 +329,7 @@
                 </thead>
                 <tbody></tbody>
             </table>
+            <button class="download-button" onclick="downloadAllPDF()">Download All Results as PDF</button>
         </div>
     </div>
 
@@ -343,6 +344,7 @@
             document.querySelectorAll('td').forEach(td => td.classList.toggle('dark-mode'));
             document.querySelectorAll('.edit-button').forEach(button => button.classList.toggle('dark-mode'));
             document.querySelectorAll('.delete-button').forEach(button => button.classList.toggle('dark-mode'));
+            document.querySelectorAll('.download-button').forEach(button => button.classList.toggle('dark-mode'));
             document.querySelectorAll('.sidebar a').forEach(link => link.classList.toggle('dark-mode'));
         });
 
@@ -412,6 +414,23 @@
                 `;
                 resultsTable.appendChild(row);
             });
+        }
+
+        function downloadAllPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.text("All Students Grade Report", 14, 16);
+
+            const results = JSON.parse(localStorage.getItem('results')) || [];
+            let y = 26; // Starting y position for text
+
+            results.forEach(({ name, total, average }, index) => {
+                doc.text(`${index + 1}. ${name} - Total: ${total}/100, Average: ${average}%`, 14, y);
+                y += 10; // Increment y position for next entry
+            });
+
+            doc.save("all_students_results.pdf");
         }
 
         // Display saved results on load
