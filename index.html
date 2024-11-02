@@ -3,272 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Result Management System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Login - Student Result Management System</title>
     <style>
         body {
             margin: 0;
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        body.dark-mode {
-            background-color: #343a40;
-            color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
         }
         header {
-            background-color: #007bff;
+            background-color: #1e90ff;
             color: white;
-            padding: 40px 20px;
+            padding: 20px;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            border-bottom: 5px solid #0056b3;
         }
-        body.dark-mode header {
-            background-color: #0056b3;
-        }
-        nav {
-            background-color: #343a40;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 15px 0;
-        }
-        body.dark-mode nav {
-            background-color: #495057;
-        }
-        nav a {
-            color: white;
-            padding: 12px 20px;
-            text-decoration: none;
-            text-transform: uppercase;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-            margin: 0 10px;
-        }
-        nav a:hover {
-            background-color: #495057;
-            border-radius: 5px;
-        }
-        .admin-btn {
-            background-color: #dc3545;
-            color: white;
-            font-weight: bold;
-            border-radius: 5px;
-            padding: 12px 20px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-        }
-        .admin-btn:hover {
-            background-color: #c82333;
-            transform: scale(1.05);
-        }
-
-        /* Main Section */
         main {
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            margin: 60px 0;
-            padding: 0 20px;
+            height: 80vh;
         }
-        h1 {
-            font-size: 28px;
+        .login-box {
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
             margin-bottom: 20px;
+            font-size: 22px;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
             font-weight: bold;
         }
-        p {
-            font-size: 18px;
-            text-align: center;
-            margin-bottom: 30px;
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input[type="text"]::placeholder, input[type="password"]::placeholder {
+            color: #aaa;
         }
         .btn {
-            padding: 14px 30px;
-            background-color: #007bff;
+            width: 100%;
+            padding: 10px;
+            background-color: #1e90ff;
             color: white;
-            text-decoration: none;
+            border: none;
             border-radius: 5px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-            margin: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
         }
         .btn:hover {
-            background-color: #0056b3;
+            background-color: #1c86ee;
         }
-        .features {
-            display: flex;
-            justify-content: space-around;
-            width: 80%;
-            flex-wrap: wrap;
-            margin: 50px 0;
-        }
-        .feature {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 30%;
-            min-width: 250px;
-            margin: 10px;
+        .forgot-password {
             text-align: center;
-            transition: transform 0.3s ease;
+            margin-top: 10px;
         }
-        body.dark-mode .feature {
-            background-color: #495057;
-            color: #f8f9fa;
-        }
-        .feature:hover {
-            transform: scale(1.05);
-        }
-        .feature h3 {
-            font-size: 22px;
-            margin-bottom: 15px;
-            color: #007bff;
-        }
-        body.dark-mode .feature h3 {
-            color: #fff;
-        }
-        .feature p {
-            font-size: 16px;
-            color: #666;
-        }
-        body.dark-mode .feature p {
-            color: #ccc;
-        }
-        footer {
-            background-color: #343a40;
-            color: white;
-            text-align: center;
-            padding: 30px 20px;
-            margin-top: 50px;
-            font-size: 14px;
-        }
-        body.dark-mode footer {
-            background-color: #495057;
-        }
-        footer a {
-            color: #007bff;
+        .forgot-password a {
+            color: #1e90ff;
             text-decoration: none;
         }
-        footer a:hover {
+        .forgot-password a:hover {
             text-decoration: underline;
         }
-        @media (max-width: 1024px) {
-            .feature {
-                width: 45%; /* Two items per row */
-            }
-        }
-        @media (max-width: 768px) {
-            nav {
-                flex-direction: column; /* Stack navigation items */
-            }
-            .features {
-                flex-direction: column; /* Stack features vertically */
-                align-items: center;
-            }
-            .feature {
-                width: 80%; /* Full width for smaller screens */
-                margin-bottom: 20px;
-            }
-        }
-        @media (max-width: 480px) {
-            header h1 {
-                font-size: 24px; /* Smaller title font */
-            }
-            nav a {
-                padding: 10px 15px; /* Smaller padding */
-            }
-            .btn {
-                padding: 12px 20px; /* Smaller button padding */
-            }
-            .feature h3 {
-                font-size: 20px; /* Smaller feature title */
-            }
-            .feature p {
-                font-size: 14px; /* Smaller feature text */
-            }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #333;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Welcome to the Student Result Management System</h1>
-        <p>Your comprehensive platform for managing student results and records.</p>
+        <h1>Student Result Management System</h1>
     </header>
-
-    <!-- Navigation Bar -->
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="results.html">View Student Results</a>
-        <a href="./contact.html">Contact Us</a>
-        <a href="./about.html">About Us</a>
-        <a href="dashboard.html" class="admin-btn">Admin Dashboard</a>
-        <button id="darkModeToggle" style="margin-left: 10px; padding: 10px; background: none; border: none; color: white; font-weight: bold; cursor: pointer;">
-            <i id="toggleIcon" class="fas fa-sun"></i> <!-- Initial icon -->
-        </button>
-    </nav>
-
-    <!-- Main Section -->
     <main>
-        <p>Efficiently manage and access student results and academic records.</p>
-        <a href="login.html" class="btn">Login to Your Account</a>
-        <a href="signup.html" class="btn" style="background-color: #28a745;">Create an Account</a>
+        <div class="login-box">
+            <h2>Login to your account</h2>
+            <form id="loginForm">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required>
 
-        <!-- Features Section -->
-        <section class="features">
-            <div class="feature">
-                <h3>Secure Login</h3>
-                <p>Access your student results securely with unique logins for each user.</p>
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <p>If you haven't an account, please | <a href="./signup.html">Sign Up</a></p>
+
+            <div class="forgot-password">
+                <p><a href="./forgot.html">Forgot your password?</a></p>
             </div>
-            <div class="feature">
-                <h3>Data Management</h3>
-                <p>Store, manage, and retrieve academic records with ease using our system.</p>
-            </div>
-            <div class="feature">
-                <h3>Performance Reports</h3>
-                <p>Generate detailed performance reports for students, teachers, and administrators.</p>
-            </div>
-            <div class="feature">
-                <h3>User-Friendly Interface</h3>
-                <p>Our intuitive design ensures a seamless experience for all users.</p>
-            </div>
-            <div class="feature">
-                <h3>24/7 Support</h3>
-                <p>Our support team is available around the clock to assist you with any inquiries.</p>
-            </div>
-            <div class="feature">
-                <h3>Data Security</h3>
-                <p>Your data is protected with top-notch security measures and encryption.</p>
-            </div>
-        </section>
+        </div>
     </main>
 
-    <!-- Footer Section -->
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2024 Student Result Management System. All rights reserved. | 
-            <a href="#">Privacy Policy</a> | 
-            <a href="#">Terms of Service</a>
-        </p>
+        &copy; 2024 Student Result Management System. All rights reserved.
     </footer>
 
     <script>
-        // Dark mode toggle functionality
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const toggleIcon = document.getElementById('toggleIcon');
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-        darkModeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            // Change icon based on dark mode state
-            if (document.body.classList.contains('dark-mode')) {
-                toggleIcon.classList.remove('fas', 'fa-sun');
-                toggleIcon.classList.add('fas', 'fa-moon');
+            if (username === 'admin@admin.com' && password === 'admin') {
+                window.location.href = 'dashboard.html'; // Redirect to admin page
+            } else if (username === 'user@user.com' && password === 'user') {
+                window.location.href = 'user.html'; // Redirect to user page
+            } else if (username === 'teacher@teacher.com' && password === 'teacher') {
+                window.location.href = 'teacher.html'; // Redirect to user page
             } else {
-                toggleIcon.classList.remove('fas', 'fa-moon');
-                toggleIcon.classList.add('fas', 'fa-sun');
+                alert('Invalid username or password. Please try again.');
             }
         });
     </script>
 </body>
 </html>
+    
