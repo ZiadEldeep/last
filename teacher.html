@@ -6,46 +6,58 @@
     <title>Student Results</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f9fafb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9f5fb;
             color: #333;
             padding: 20px;
+            margin: 0;
+            line-height: 1.6;
+        }
+        h2 {
+            text-align: center;
+            color: #2563eb;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 12px;
+            padding: 15px;
             text-align: left;
         }
         th {
-            background-color: #2563eb;
+            background-color: #4a90e2;
             color: white;
         }
         .button {
-            margin-top: 20px;
             padding: 10px 20px;
-            background-color: #2563eb;
+            background-color: #4a90e2;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            display: inline-block;
+            margin: 10px 5px;
+            text-align: center;
         }
         .button:hover {
-            background-color: #1d4ed8;
+            background-color: #357ABD;
         }
         #chartContainer {
             margin-top: 40px;
-            width: 40%;
-            max-width: 800px;
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
+        }
+        canvas {
+            width: 60% !important; /* 40% width for better layout */
+            height: 400px !important; /* Fixed height for charts */
         }
         #subjectFields {
             margin-top: 10px;
@@ -53,8 +65,18 @@
         .subject-field {
             margin-bottom: 10px;
         }
-        #loadMoreButton {
-            display: none; /* Initially hidden */
+        .subject-field input {
+            margin-right: 5px;
+        }
+        form {
+            margin-bottom: 20px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .hidden {
+            display: none;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -90,37 +112,35 @@
         </tbody>
     </table>
 
-    <button id="loadMoreButton" class="button" onclick="loadMoreStudents()">See More</button>
+    <button id="loadMoreButton" class="button hidden" onclick="loadMoreStudents()">See More</button>
 
     <div id="chartContainer">
-        <canvas id="subjectPieChart" width="400" height="400"></canvas>
-        <canvas id="subjectBarChart" width="400" height="400"></canvas>
+        <canvas id="subjectPieChart"></canvas>
+        <canvas id="subjectBarChart"></canvas>
     </div>
 
     <script>
         let students = JSON.parse(localStorage.getItem('students')) || {};
-        let displayedStudents = []; // Array to keep track of displayed students
-        let currentIndex = 0; // Current index for pagination
+        let displayedStudents = [];
+        let currentIndex = 0;
 
-        // Dummy data generation for 50 students
         function generateDummyData() {
             const subjectsList = ['Math', 'Science', 'History', 'English', 'Art', 'PE', 'Biology', 'Chemistry', 'Physics', 'Music'];
             for (let i = 1; i <= 50; i++) {
                 const name = `Student ${i}`;
                 const subjects = {};
-                // Randomly assign 3-5 subjects to each student
-                const numSubjects = Math.floor(Math.random() * 3) + 3; // Random number of subjects between 3 and 5
+                const numSubjects = Math.floor(Math.random() * 3) + 3;
                 const selectedSubjects = [];
 
                 while (selectedSubjects.length < numSubjects) {
                     const randomSubject = subjectsList[Math.floor(Math.random() * subjectsList.length)];
                     if (!selectedSubjects.includes(randomSubject)) {
                         selectedSubjects.push(randomSubject);
-                        subjects[randomSubject] = (Math.random() * 5).toFixed(1); // Random grade between 0 and 5
+                        subjects[randomSubject] = (Math.random() * 5).toFixed(1);
                     }
                 }
 
-                const studentId = new Date().getTime() + i; // Unique ID
+                const studentId = new Date().getTime() + i;
                 students[studentId] = { name, subjects };
             }
             localStorage.setItem('students', JSON.stringify(students));
@@ -201,41 +221,24 @@
                 }
             });
 
-            const studentId = new Date().getTime(); // Unique ID based on timestamp
-
-            students[studentId] = {
-                name: name,
-                subjects: subjects
-            };
-
+            const studentId = new Date().getTime();
+            students[studentId] = { name, subjects };
             localStorage.setItem('students', JSON.stringify(students));
-            resetForm();
-            renderResultsTable();
-        }
-
-        function resetForm() {
-            document.getElementById('addStudentForm').reset();
-            document.querySelector('#subjectFields').innerHTML = '<div class="subject-field"><input type="text" placeholder="Subject Name" class="subjectName" required><input type="number" placeholder="Grade" class="subjectGrade" min="0" max="5" step="0.1" required></div>';
-            currentIndex = 0; // Reset index to show the new student
-            displayedStudents = [];
-            loadMoreStudents(); // Load the first set of students
+            document.getElementById('studentName').value = '';
+            document.querySelectorAll('.subject-field').forEach(field => field.remove());
+            loadMoreStudents();
         }
 
         function deleteStudent(studentId) {
             delete students[studentId];
             localStorage.setItem('students', JSON.stringify(students));
-            resetForm(); // Reset to show updated list
-        }
-
-        function generateColor(index) {
-            // Generate a color based on the index
-            const hue = index * 60; // Adjust the hue to spread colors
-            return `hsl(${hue}, 70%, 50%)`;
+            displayedStudents = [];
+            currentIndex = 0;
+            loadMoreStudents();
         }
 
         function updateCharts() {
             const subjectGrades = {};
-
             for (const studentId in students) {
                 const student = students[studentId];
                 for (const subject in student.subjects) {
@@ -314,6 +317,17 @@
                     }
                 },
             });
+        }
+
+        function generateColor(index) {
+            const colors = [
+                '#FF6384', '#36A2EB', '#FFCE56',
+                '#4BC0C0', '#9966FF', '#FF9F40',
+                '#FF3C8E', '#3CFF8E', '#8E3CFF',
+                '#8EFF3C', '#FFC03C', '#3C8EFF',
+                '#3CFFCE', '#CE3CFF', '#FFCE3C'
+            ];
+            return colors[index % colors.length];
         }
 
         // Initialize data
