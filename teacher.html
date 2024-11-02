@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Results</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        canvas {
+            max-width: 400px;
+            max-height: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Student Results</h1>
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Subjects</th>
+                <th>Grades</th>
+                <th>Average Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Results will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <button onclick="exportToPDF()">Export to PDF</button>
+    <button onclick="exportToExcel()">Export to Excel</button>
+
+    <h2>Charts</h2>
+    <canvas id="subjectPieChart"></canvas>
+    <canvas id="subjectBarChart"></canvas>
+
+    <script>
+        const students = {
+            1: { name: "Alice", subjects: { Math: 4, Science: 5, History: 3 } },
+            2: { name: "Bob", subjects: { Math: 5, Science: 4, History: 5 } },
+            3: { name: "Charlie", subjects: { Math: 2, Science: 3, History: 4 } },
+            4: { name: "David", subjects: { Math: 3, Science: 2, History: 3 } },
+            5: { name: "Eva", subjects: { Math: 4, Science: 3, History: 5 } }
+        };
+
+        function renderResultsTable() {
+            const tbody = document.querySelector('#resultsTable tbody');
+            tbody.innerHTML = '';
+
+            Object.values(students).forEach(student => {
+                const avgGrade = calculateAverageGrade(student.subjects);
+                const row = `
+                    <tr>
+                        <td>${student.name}</td>
+                        <td>${Object.keys(student.subjects).join(', ')}</td>
+                        <td>${Object.entries(student.subjects).map(([subject, grade]) => `${subject}: ${grade || 'No Data'}`).join(', ')}</td>
+                        <td>${avgGrade}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+
+            updateCharts();
+        }
+
+        function calculateAverageGrade(subjects) {
+            const totalGrades = Object.values(subjects).reduce((sum, grade) => sum + (grade || 0), 0);
+            const count = Object.values(subjects).filter(grade => grade !== null).length;
+            return (count > 0) ? (totalGrades / count).toFixed(2) : 'No Data';
+        }
+
+        function gradeToNumber(grade) {
+            return grade !== null ? grade : 0;
+        }
+
+        async function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add table
+            doc.autoTable({ html: '#resultsTable' });
+
+            // Add charts
+            const pieChartCanvas = document.getElementById('subjectPieChart');
+            const barChartCanvas = document.getElementById('subjectBarChart');
+            const pieChartImg = pieChartCanvas.toDataURL('image/png');
+            const barChartImg = barChartCanvas.toDataURL('image/png');
+
+            doc.addPage();
+            doc.text('Average Grades by Subject (Pie Chart)', 10, 10);
+            doc.addImage(pieChartImg, 'PNG', 10, 20, 180, 90);
+            doc.addPage();
+            doc.text('Average Grades by Subject (Bar Chart)', 10, 10);
+            doc.addImage(barChartImg, 'PNG', 10, 20, 180, 90);
+
+            doc.save("Student_Results.pdf");
+        }
+
+        function exportToExcel() {
+            const worksheet = XLSX.utils.json_to_sheet(Object.values(students).map(student => {
+                return {
+                    Name: student.name,
+                    Subjects: Object.keys(student.subjects).join(', '),
+                    Grades: Object.entries(student.subjects).map(([subject, grade]) => `${subject}: ${grade || 'No Data'}`).join(', '),
+                    "Average Grade": calculateAverageGrade(student.subjects)
+                };
+            }));
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Results");
+            XLSX.writeFile(workbook, "Student_Results.xlsx");
+        }
+
+        function updateCharts() {
+            const subjectGrades = {};
+            const subjectCounts = {};
+
+            for (const studentId in students) {
+                const student = students[studentId];
+                for (const subject in student.subjects) {
+                    if (!subjectGrades[subject]) {
+                        subjectGrades[subject] = 0;
+                        subjectCounts[subject] = 0;
+                    }
+                    subjectGrades[subject] += gradeToNumber(student.subjects[subject]);
+                    subjectCounts[subject]++;
+                }
+            }
+
+            const subjectLabels = Object.keys(subjectGrades);
+            const subjectAverages = subjectLabels.map(subject => (subjectGrades[subject] / subjectCounts[subject]).toFixed(2));
+
+            const ctxPie = document.getElementById('subjectPieChart').getContext('2d');
+            const ctxBar = document.getElementById('subjectBarChart').getContext('2d');
+
+            // Pie Chart
+            new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: subjectLabels,
+                    datasets: [{
+                        label: 'Average Grades by Subject',
+                        data: subjectAverages,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                        ],
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Average Grades by Subject (Pie Chart)',
+                        }
+                    },
+                    maintainAspectRatio: false,
+                }
+            });
+
+            // Bar Chart
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: subjectLabels,
+                    datasets: [{
+                        label: 'Average Grades',
+                        data: subjectAverages,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5,
+                            title: {
+                                display: true,
+                                text: 'Grades',
+                            },
+                        },
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Average Grades by Subject (Bar Chart)',
+                        }
+                    },
+                    maintainAspectRatio: false,
+                }
+            });
+        }
+
+        // Initial render
+        renderResultsTable();
+    </script>
+</body>
+
+</html>
