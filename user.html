@@ -99,11 +99,8 @@
     <div>
         <h2>User Dashboard</h2>
         <a href="home.html">Home</a>
-        <!-- <a href="results.html">View Results</a> -->
-        <!-- <a href="degrees.html">Degrees Calculator</a> -->
         <a href="contact.html">Contact Us</a>
         <a href="about.html">About Us</a>
-        <!-- <a href="excel.html">Degrees and grades</a> -->
     </div>
     <div>
         <button id="darkModeToggle" class="dark-mode-toggle">Enable Dark Mode</button>
@@ -148,6 +145,8 @@
                 <ul id="quizzesList"></ul>
                 <h5>Assignments:</h5>
                 <ul id="assignmentsList"></ul>
+                <h5>Lab:</h5>
+                <ul id="labList"></ul>
                 <h4>Average Grade: <span id="averageDisplay"></span>%</h4>
                 <h4>Percentage: <span id="percentageDisplay"></span>%</h4>
                 <div id="additionalInfo"></div>
@@ -173,36 +172,48 @@
         darkModeToggle.textContent = darkModeToggle.textContent.includes('Enable') ? 'Disable Dark Mode' : 'Enable Dark Mode';
     });
 
-    // Example student data for 20 students with numbers 200-250 and grades on a 0 to 100 scale
+    // Example student data
     const studentData = {
         'Name 1': {
             number: '200',
             degrees: ['B.Sc. in Biology'],
-            midTermGrades: [87.5, 95],
-            finalGrades: [100, 97.5],
-            quizzes: [87.5, 100, 112.5],
-            assignments: [100, 87.5, 100],
+            grades: {
+                midTerm: { Math: 10, Science: 12, English: 13 }, // Max 15
+                final: { Math: 30, Science: 35, English: 40 }, // Max 40
+                quizzes: { Math: 5, Science: 4, English: 3 }, // Max 5
+                assignments: { Math: 8, Science: 9, English: 10 }, // Max 10
+                additionalAssignments: { Math: 8, Science: 9, English: 10 }, // Max 10
+                lab: { Math: 15, Science: 20, English: 18 } // Max 20
+            },
             subjects: { Math: 100, Science: 87.5, English: 75 }
         },
         'Name 2': {
             number: '201',
             degrees: ['B.Sc. in Chemistry'],
-            midTermGrades: [70, 80],
-            finalGrades: [75, 77.5],
-            quizzes: [62.5, 75, 75],
-            assignments: [75, 62.5, 70],
+            grades: {
+                midTerm: { Math: 12, Science: 10, English: 9 },
+                final: { Math: 35, Science: 32, English: 38 },
+                quizzes: { Math: 3, Science: 4, English: 5 },
+                assignments: { Math: 7, Science: 8, English: 10 },
+                additionalAssignments: { Math: 9, Science: 7, English: 6 },
+                lab: { Math: 18, Science: 20, English: 15 }
+            },
             subjects: { Math: 50, Science: 87.5, English: 80 }
         },
         'Name 3': {
             number: '202',
             degrees: ['B.Sc. in Physics'],
-            midTermGrades: [97.5, 100],
-            finalGrades: [100, 100],
-            quizzes: [100, 100, 112.5],
-            assignments: [112.5, 100, 100],
+            grades: {
+                midTerm: { Math: 15, Science: 15, English: 15 },
+                final: { Math: 40, Science: 40, English: 38 },
+                quizzes: { Math: 5, Science: 5, English: 5 },
+                assignments: { Math: 10, Science: 9, English: 8 },
+                additionalAssignments: { Math: 10, Science: 10, English: 10 },
+                lab: { Math: 20, Science: 20, English: 20 }
+            },
             subjects: { Math: 100, Science: 97.5, English: 95 }
         },
-        // ... (add similar data for other students)
+        // ... Add more student data as needed
     };
 
     document.getElementById('submitBtn').addEventListener('click', function() {
@@ -215,6 +226,7 @@
         const finalList = document.getElementById('finalList');
         const quizzesList = document.getElementById('quizzesList');
         const assignmentsList = document.getElementById('assignmentsList');
+        const labList = document.getElementById('labList');
         const averageDisplay = document.getElementById('averageDisplay');
         const percentageDisplay = document.getElementById('percentageDisplay');
         const additionalInfo = document.getElementById('additionalInfo');
@@ -228,6 +240,7 @@
         finalList.innerHTML = '';
         quizzesList.innerHTML = '';
         assignmentsList.innerHTML = '';
+        labList.innerHTML = '';
         errorMessage.textContent = '';
         successMessage.textContent = '';
         failMessage.textContent = '';
@@ -247,48 +260,67 @@
             });
 
             // Populate mid-term grades
-            studentInfo.midTermGrades.forEach((grade, index) => {
+            for (const subject in studentInfo.grades.midTerm) {
                 const li = document.createElement('li');
-                li.textContent = `Mid-Term ${index + 1}: ${grade.toFixed(2)}`;
+                li.textContent = `${subject} Mid-Term: ${studentInfo.grades.midTerm[subject].toFixed(2)}`;
                 midTermList.appendChild(li);
-            });
+            }
 
             // Populate final grades
-            studentInfo.finalGrades.forEach((grade, index) => {
+            for (const subject in studentInfo.grades.final) {
                 const li = document.createElement('li');
-                li.textContent = `Final ${index + 1}: ${grade.toFixed(2)}`;
+                li.textContent = `${subject} Final: ${studentInfo.grades.final[subject].toFixed(2)}`;
                 finalList.appendChild(li);
-            });
+            }
 
             // Populate quizzes
-            studentInfo.quizzes.forEach((grade, index) => {
+            for (const subject in studentInfo.grades.quizzes) {
                 const li = document.createElement('li');
-                li.textContent = `Quiz ${index + 1}: ${grade.toFixed(2)}`;
+                li.textContent = `${subject} Quiz: ${studentInfo.grades.quizzes[subject].toFixed(2)}`;
                 quizzesList.appendChild(li);
-            });
+            }
 
             // Populate assignments
-            studentInfo.assignments.forEach((grade, index) => {
+            for (const subject in studentInfo.grades.assignments) {
                 const li = document.createElement('li');
-                li.textContent = `Assignment ${index + 1}: ${grade.toFixed(2)}`;
+                li.textContent = `${subject} Assignment: ${studentInfo.grades.assignments[subject].toFixed(2)}`;
                 assignmentsList.appendChild(li);
-            });
+            }
 
-            // Calculate average
-            const allGrades = [
-                ...studentInfo.midTermGrades,
-                ...studentInfo.finalGrades,
-                ...studentInfo.quizzes,
-                ...studentInfo.assignments
-            ];
+            // Populate additional assignments
+            for (const subject in studentInfo.grades.additionalAssignments) {
+                const li = document.createElement('li');
+                li.textContent = `${subject} Additional Assignment: ${studentInfo.grades.additionalAssignments[subject].toFixed(2)}`;
+                assignmentsList.appendChild(li);
+            }
 
-            const average = allGrades.reduce((a, b) => a + b, 0) / allGrades.length;
+            // Populate lab grades
+            for (const subject in studentInfo.grades.lab) {
+                const li = document.createElement('li');
+                li.textContent = `${subject} Lab: ${studentInfo.grades.lab[subject].toFixed(2)}`;
+                labList.appendChild(li);
+            }
 
-            // Display average
+            // Calculate total and average
+            const totalGrades = {
+                midTerm: 15,
+                final: 40,
+                quizzes: 5,
+                assignments: 10,
+                additionalAssignments: 10,
+                lab: 20
+            };
+
+            const maxPoints = Object.values(totalGrades).reduce((acc, val) => acc + val * Object.keys(studentInfo.grades.midTerm).length, 0);
+            const totalPoints = Object.entries(studentInfo.grades).reduce((acc, [type, subjects]) => {
+                return acc + Object.values(subjects).reduce((sum, score) => sum + score, 0);
+            }, 0);
+
+            const average = Math.min((totalPoints / maxPoints) * 100, 100); // Ensure it doesn't exceed 100
+
+            // Display average and percentage
             averageDisplay.textContent = average.toFixed(2);
-
-            // Display percentage
-            percentageDisplay.textContent = (average).toFixed(2);
+            percentageDisplay.textContent = average.toFixed(2);
 
             // Additional information about grades
             additionalInfo.innerHTML = `<strong>Your Grades:</strong> Math: ${studentInfo.subjects.Math.toFixed(2)}%, Science: ${studentInfo.subjects.Science.toFixed(2)}%, English: ${studentInfo.subjects.English.toFixed(2)}%`;
