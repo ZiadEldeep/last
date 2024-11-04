@@ -79,8 +79,8 @@
 <body>
     <h2>Student Results</h2>
 
-    <button class="sort-button" onclick="sortStudents('asc')">Sort by Grades Ascending</button>
-    <button class="sort-button" onclick="sortStudents('desc')">Sort by Grades Descending</button>
+    <button class="sort-button" onclick="sortStudents('asc')">Sort by Average Grades Ascending</button>
+    <button class="sort-button" onclick="sortStudents('desc')">Sort by Average Grades Descending</button>
 
     <select id="exportSelect" class="export-button" onchange="toggleDownloadButton()">
         <option value="">Select Export Format</option>
@@ -98,6 +98,11 @@
                 <th>Subjects</th>
                 <th>Grades</th>
                 <th>Average Grade</th>
+                <th>Quizzes</th>
+                <th>Assignments</th>
+                <th>Final</th>
+                <th>Midterm</th>
+                <th>Degree</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -111,12 +116,20 @@
     </div>
 
     <script>
-        // Retrieve students data from local storage or initialize with dummy data
         const students = JSON.parse(localStorage.getItem('students')) || {
-            1: { name: "John Doe", subjects: { Math: 3.5, Science: null, History: null } },
-            2: { name: "Jane Smith", subjects: { Math: null, Science: 2.0, History: null } },
-            3: { name: "Sam Johnson", subjects: { Math: null, Science: null, History: 1.5 } },
-            4: { name: "Lisa White", subjects: { Math: 2.0, Science: null, History: null } }
+            1: { name: "John Doe", subjects: { Math: 3.5, Science: 4.0, History: 2.5 }, quizzes: 4, assignments: 8, final: 35, midterm: 15, degree: "Bachelor's" },
+            2: { name: "Jane Smith", subjects: { Math: 2.0, Science: 3.0, History: 3.5 }, quizzes: 3, assignments: 5, final: 30, midterm: 18, degree: "Bachelor's" },
+            3: { name: "Sam Johnson", subjects: { Math: 4.0, Science: 2.5, History: 3.0 }, quizzes: 5, assignments: 9, final: 38, midterm: 17, degree: "Master's" },
+            4: { name: "Lisa White", subjects: { Math: 1.5, Science: 3.5, History: 2.0 }, quizzes: 2, assignments: 6, final: 28, midterm: 10, degree: "Associate's" },
+            5: { name: "Mike Brown", subjects: { Math: 3.0, Science: 4.0, History: 3.5 }, quizzes: 4, assignments: 7, final: 36, midterm: 20, degree: "Bachelor's" },
+            6: { name: "Sara Lee", subjects: { Math: 2.5, Science: 3.5, History: 1.0 }, quizzes: 1, assignments: 4, final: 22, midterm: 12, degree: "Master's" },
+            7: { name: "David Wilson", subjects: { Math: 3.5, Science: 4.0, History: 3.0 }, quizzes: 3, assignments: 8, final: 34, midterm: 15, degree: "Bachelor's" },
+            8: { name: "Emily Davis", subjects: { Math: 2.0, Science: 1.5, History: 2.5 }, quizzes: 2, assignments: 5, final: 27, midterm: 14, degree: "Bachelor's" },
+            9: { name: "Chris Martin", subjects: { Math: 4.0, Science: 4.0, History: 4.0 }, quizzes: 5, assignments: 10, final: 40, midterm: 20, degree: "Doctorate" },
+            10: { name: "Olivia Taylor", subjects: { Math: 3.0, Science: 2.0, History: 3.5 }, quizzes: 3, assignments: 6, final: 30, midterm: 10, degree: "Bachelor's" },
+            11: { name: "James Anderson", subjects: { Math: 2.5, Science: 3.0, History: 2.0 }, quizzes: 4, assignments: 7, final: 29, midterm: 16, degree: "Associate's" },
+            12: { name: "Sophia Thomas", subjects: { Math: 1.0, Science: 1.5, History: 2.5 }, quizzes: 1, assignments: 3, final: 20, midterm: 11, degree: "Associate's" },
+            13: { name: "Daniel Moore", subjects: { Math: 3.0, Science: 4.0, History: 3.0 }, quizzes: 4, assignments: 8, final: 32, midterm: 19, degree: "Bachelor's" }
         };
 
         function gradeToNumber(grade) {
@@ -147,6 +160,11 @@
                     <td>${Object.keys(student.subjects).join(', ')}</td>
                     <td>${subjectsWithGrades}</td>
                     <td>${avgGrade}</td>
+                    <td>${student.quizzes}</td>
+                    <td>${student.assignments}</td>
+                    <td>${student.final}</td>
+                    <td>${student.midterm}</td>
+                    <td>${student.degree}</td>
                     <td><button class="delete-button" onclick="deleteStudent('${studentId}')">Delete</button></td>
                 `;
                 resultsTableBody.appendChild(row);
@@ -186,7 +204,12 @@
                     <td>${Object.keys(student.subjects).join(', ')}</td>
                     <td>${subjectsWithGrades}</td>
                     <td>${avgGrade}</td>
-                    <td><button class="delete-button" onclick="deleteStudent('${studentId}')">Delete</button></td>
+                    <td>${student.quizzes}</td>
+                    <td>${student.assignments}</td>
+                    <td>${student.final}</td>
+                    <td>${student.midterm}</td>
+                    <td>${student.degree}</td>
+                    <td><button class="delete-button" onclick="deleteStudent('${student.id}')">Delete</button></td>
                 `;
                 resultsTableBody.appendChild(row);
             });
@@ -213,14 +236,14 @@
 
         function exportToExcel() {
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Name,Subjects,Grades,Average Grade\n";
+            csvContent += "Name,Subjects,Grades,Average Grade,Quizzes,Assignments,Final,Midterm,Degree\n";
 
             Object.values(students).forEach(student => {
                 const subjectsWithGrades = Object.keys(student.subjects)
                     .map(subject => `${subject}: ${student.subjects[subject] || 'No Data'}`)
                     .join(', ');
                 const avgGrade = calculateAverageGrade(student.subjects);
-                const row = `${student.name},"${Object.keys(student.subjects).join(', ')}","${subjectsWithGrades}","${avgGrade}"\n`;
+                const row = `${student.name},"${Object.keys(student.subjects).join(', ')}","${subjectsWithGrades}","${avgGrade}","${student.quizzes}","${student.assignments}","${student.final}","${student.midterm}","${student.degree}"\n`;
                 csvContent += row;
             });
 
