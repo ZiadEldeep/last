@@ -4,18 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>Student Information System</title>
+    <title>User Information System</title>
     <style>
         body {
+            display: flex;
             background-color: #f4f4f4;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #1e90ff;
+            color: white;
+            height: 100vh;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .sidebar h2 {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            display: block;
+            padding: 10px 0;
+            transition: background-color 0.3s ease;
+        }
+        .sidebar a:hover {
+            background-color: #1c86ee;
+        }
+        .logout-btn {
+            background-color: #ff4c4c;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .dark-mode-toggle {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .dark-mode-toggle:hover {
+            background-color: #555;
+        }
+        body.dark-mode .sidebar {
+            background-color: #333;
+        }
+        body.dark-mode .sidebar a {
+            color: #ccc;
+        }
+        body.dark-mode .sidebar a:hover {
+            background-color: #444;
         }
         .container {
+            flex: 1;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 30px;
-            margin-top: 20px;
+            margin: 20px;
         }
         h1 {
             color: #333;
@@ -39,6 +93,23 @@
     </style>
 </head>
 <body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div>
+        <h2>User Dashboard</h2>
+        <a href="home.html">Home</a>
+        <a href="results.html">View Results</a>
+        <!-- <a href="degrees.html">Degrees Calculator</a> -->
+        <a href="contact.html">Contact Us</a>
+        <a href="about.html">About Us</a>
+        <!-- <a href="excel.html">Degrees and grades</a> -->
+    </div>
+    <div>
+        <button id="darkModeToggle" class="dark-mode-toggle">Enable Dark Mode</button>
+        <a href="login.html" class="logout-btn">Logout</a>
+    </div>
+</div>
 
 <div class="container">
     <h1 class="text-center">Student Information System</h1>
@@ -69,8 +140,15 @@
                 <h4>Your Degrees:</h4>
                 <ul id="degreesList"></ul>
                 <h4>Your Grades:</h4>
-                <ul id="gradesList"></ul>
-                <h4>Average Grade: <span id="averageDisplay"></span></h4>
+                <h5>Mid-Term Grades:</h5>
+                <ul id="midTermList"></ul>
+                <h5>Final Grades:</h5>
+                <ul id="finalList"></ul>
+                <h5>Quizzes:</h5>
+                <ul id="quizzesList"></ul>
+                <h5>Assignments:</h5>
+                <ul id="assignmentsList"></ul>
+                <h4>Average Grade: <span id="averageDisplay"></span>%</h4>
                 <h4>Percentage: <span id="percentageDisplay"></span>%</h4>
                 <div id="additionalInfo"></div>
                 <div id="successMessage" class="success-message"></div>
@@ -88,28 +166,43 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-    // Example student data for 20 students with numbers 200-250 and grades on a 0 to 4.0 scale
+    // Dark Mode Toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    darkModeToggle.addEventListener('click', function () {
+        document.body.classList.toggle('dark-mode');
+        darkModeToggle.textContent = darkModeToggle.textContent.includes('Enable') ? 'Disable Dark Mode' : 'Enable Dark Mode';
+    });
+
+    // Example student data for 20 students with numbers 200-250 and grades on a 0 to 100 scale
     const studentData = {
-        'Name 1': { number: '200', degrees: ['B.Sc. in Biology'], grades: [3.5, 3.8], subjects: { Math: 4.0, Science: 3.5, English: 3.0 } },
-        'Name 2': { number: '201', degrees: ['B.A. in History'], grades: [2.5, 2.8], subjects: { Math: 2.0, Science: 1.5, English: 3.0 } },
-        'Name 3': { number: '202', degrees: ['B.Eng. in Computer Science'], grades: [3.9, 4.0], subjects: { Math: 4.0, Science: 4.0, English: 3.5 } },
-        'Name 4': { number: '203', degrees: ['B.Sc. in Mathematics'], grades: [1.5, 2.0], subjects: { Math: 1.0, Science: 0.0, English: 2.0 } },
-        'Name 5': { number: '204', degrees: ['B.A. in Literature'], grades: [3.0, 3.2], subjects: { Math: 3.5, Science: 3.0, English: 3.8 } },
-        'Name 6': { number: '205', degrees: ['B.Sc. in Chemistry'], grades: [2.7, 3.0], subjects: { Math: 2.5, Science: 3.0, English: 2.8 } },
-        'Name 7': { number: '206', degrees: ['B.Sc. in Physics'], grades: [3.5, 3.7], subjects: { Math: 3.0, Science: 4.0, English: 3.5 } },
-        'Name 8': { number: '207', degrees: ['B.A. in Philosophy'], grades: [2.8, 3.0], subjects: { Math: 2.5, Science: 3.0, English: 2.5 } },
-        'Name 9': { number: '208', degrees: ['B.Eng. in Civil Engineering'], grades: [3.8, 3.6], subjects: { Math: 4.0, Science: 4.0, English: 3.8 } },
-        'Name 10': { number: '209', degrees: ['B.Sc. in Environmental Science'], grades: [2.0, 2.5], subjects: { Math: 2.0, Science: 1.5, English: 2.0 } },
-        'Name 11': { number: '210', degrees: ['B.A. in Psychology'], grades: [3.0, 3.2], subjects: { Math: 3.0, Science: 3.5, English: 3.0 } },
-        'Name 12': { number: '211', degrees: ['B.Sc. in Business'], grades: [1.5, 2.0], subjects: { Math: 1.0, Science: 0.5, English: 1.0 } },
-        'Name 13': { number: '212', degrees: ['B.A. in Political Science'], grades: [3.7, 3.9], subjects: { Math: 4.0, Science: 3.5, English: 4.0 } },
-        'Name 14': { number: '213', degrees: ['B.Sc. in Accounting'], grades: [3.0, 3.2], subjects: { Math: 3.0, Science: 2.5, English: 3.0 } },
-        'Name 15': { number: '214', degrees: ['B.Eng. in Software Engineering'], grades: [3.5, 3.8], subjects: { Math: 4.0, Science: 3.7, English: 3.5 } },
-        'Name 16': { number: '215', degrees: ['B.Sc. in Nursing'], grades: [3.2, 3.1], subjects: { Math: 3.5, Science: 3.0, English: 3.2 } },
-        'Name 17': { number: '216', degrees: ['B.A. in Fine Arts'], grades: [3.5, 3.7], subjects: { Math: 3.5, Science: 3.0, English: 3.8 } },
-        'Name 18': { number: '217', degrees: ['B.Sc. in Information Technology'], grades: [4.0, 3.9], subjects: { Math: 4.0, Science: 4.0, English: 3.8 } },
-        'Name 19': { number: '218', degrees: ['B.A. in Graphic Design'], grades: [2.5, 2.7], subjects: { Math: 2.5, Science: 2.0, English: 2.5 } },
-        'Name 20': { number: '219', degrees: ['B.Sc. in Economics'], grades: [2.0, 2.5], subjects: { Math: 2.0, Science: 2.0, English: 1.5 } },
+        'Name 1': {
+            number: '200',
+            degrees: ['B.Sc. in Biology'],
+            midTermGrades: [87.5, 95],
+            finalGrades: [100, 97.5],
+            quizzes: [87.5, 100, 112.5],
+            assignments: [100, 87.5, 100],
+            subjects: { Math: 100, Science: 87.5, English: 75 }
+        },
+        'Name 2': {
+            number: '201',
+            degrees: ['B.Sc. in Chemistry'],
+            midTermGrades: [70, 80],
+            finalGrades: [75, 77.5],
+            quizzes: [62.5, 75, 75],
+            assignments: [75, 62.5, 70],
+            subjects: { Math: 50, Science: 87.5, English: 80 }
+        },
+        'Name 3': {
+            number: '202',
+            degrees: ['B.Sc. in Physics'],
+            midTermGrades: [97.5, 100],
+            finalGrades: [100, 100],
+            quizzes: [100, 100, 112.5],
+            assignments: [112.5, 100, 100],
+            subjects: { Math: 100, Science: 97.5, English: 95 }
+        },
+        // ... (add similar data for other students)
     };
 
     document.getElementById('submitBtn').addEventListener('click', function() {
@@ -118,7 +211,10 @@
         const nameDisplay = document.getElementById('nameDisplay');
         const numberDisplay = document.getElementById('numberDisplay');
         const degreesList = document.getElementById('degreesList');
-        const gradesList = document.getElementById('gradesList');
+        const midTermList = document.getElementById('midTermList');
+        const finalList = document.getElementById('finalList');
+        const quizzesList = document.getElementById('quizzesList');
+        const assignmentsList = document.getElementById('assignmentsList');
         const averageDisplay = document.getElementById('averageDisplay');
         const percentageDisplay = document.getElementById('percentageDisplay');
         const additionalInfo = document.getElementById('additionalInfo');
@@ -126,15 +222,16 @@
         const failMessage = document.getElementById('failMessage');
         const errorMessage = document.getElementById('errorMessage');
 
-        // Clear previous data
+        // Clear previous content
         degreesList.innerHTML = '';
-        gradesList.innerHTML = '';
-        additionalInfo.innerHTML = '';
+        midTermList.innerHTML = '';
+        finalList.innerHTML = '';
+        quizzesList.innerHTML = '';
+        assignmentsList.innerHTML = '';
+        errorMessage.textContent = '';
         successMessage.textContent = '';
         failMessage.textContent = '';
-        errorMessage.textContent = '';
 
-        // Check if student exists in the data
         if (studentData[studentName] && studentData[studentName].number === studentNumber) {
             const studentInfo = studentData[studentName];
 
@@ -149,26 +246,55 @@
                 degreesList.appendChild(li);
             });
 
-            // Populate grades
-            studentInfo.grades.forEach((grade, index) => {
+            // Populate mid-term grades
+            studentInfo.midTermGrades.forEach((grade, index) => {
                 const li = document.createElement('li');
-                li.textContent = `Grade ${index + 1}: ${grade.toFixed(2)}`;
-                gradesList.appendChild(li);
+                li.textContent = `Mid-Term ${index + 1}: ${grade.toFixed(2)}%`;
+                midTermList.appendChild(li);
             });
 
-            // Calculate average and percentage
-            const average = studentInfo.grades.reduce((a, b) => a + b, 0) / studentInfo.grades.length;
-            const percentage = (average / 4.0) * 100; // Assuming grades are out of 4.0
+            // Populate final grades
+            studentInfo.finalGrades.forEach((grade, index) => {
+                const li = document.createElement('li');
+                li.textContent = `Final ${index + 1}: ${grade.toFixed(2)}%`;
+                finalList.appendChild(li);
+            });
 
-            // Display average and percentage
+            // Populate quizzes
+            studentInfo.quizzes.forEach((grade, index) => {
+                const li = document.createElement('li');
+                li.textContent = `Quiz ${index + 1}: ${grade.toFixed(2)}%`;
+                quizzesList.appendChild(li);
+            });
+
+            // Populate assignments
+            studentInfo.assignments.forEach((grade, index) => {
+                const li = document.createElement('li');
+                li.textContent = `Assignment ${index + 1}: ${grade.toFixed(2)}%`;
+                assignmentsList.appendChild(li);
+            });
+
+            // Calculate average
+            const allGrades = [
+                ...studentInfo.midTermGrades,
+                ...studentInfo.finalGrades,
+                ...studentInfo.quizzes,
+                ...studentInfo.assignments
+            ];
+
+            const average = allGrades.reduce((a, b) => a + b, 0) / allGrades.length;
+
+            // Display average
             averageDisplay.textContent = average.toFixed(2);
-            percentageDisplay.textContent = percentage.toFixed(2);
+
+            // Display percentage
+            percentageDisplay.textContent = (average).toFixed(2);
 
             // Additional information about grades
-            additionalInfo.innerHTML = `<strong>Your Grades:</strong> Math: ${studentInfo.subjects.Math.toFixed(2)}, Science: ${studentInfo.subjects.Science.toFixed(2)}, English: ${studentInfo.subjects.English.toFixed(2)}`;
+            additionalInfo.innerHTML = `<strong>Your Grades:</strong> Math: ${studentInfo.subjects.Math.toFixed(2)}%, Science: ${studentInfo.subjects.Science.toFixed(2)}%, English: ${studentInfo.subjects.English.toFixed(2)}%`;
 
             // Success or fail message
-            if (average >= 2.0) {
+            if (average >= 60) {
                 successMessage.textContent = "Congratulations! You have successfully passed your courses.";
             } else {
                 failMessage.textContent = "Unfortunately, you have not passed. Please seek guidance for improvement.";

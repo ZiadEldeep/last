@@ -3,28 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Results</title>
+    <title>Teacher System</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #e9f5fb;
+            background-color: #f4f7fa;
             color: #333;
-            padding: 20px;
             margin: 0;
-            line-height: 1.6;
+            display: flex;
         }
         h2 {
             text-align: center;
             color: #2563eb;
+            margin-bottom: 20px;
+        }
+        .sidebar {
+            width: 220px;
+            background-color: #4a90e2;
+            padding: 15px;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #357ABD;
+        }
+        .content {
+            margin-left: 240px; /* Space for sidebar */
+            padding: 20px;
+            flex-grow: 1;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
             background-color: #ffffff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         th, td {
             border: 1px solid #ddd;
@@ -42,13 +72,14 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.2s;
             display: inline-block;
             margin: 10px 5px;
             text-align: center;
         }
         .button:hover {
             background-color: #357ABD;
+            transform: translateY(-2px);
         }
         #chartContainer {
             margin-top: 40px;
@@ -56,7 +87,7 @@
             justify-content: space-between;
         }
         canvas {
-            width: 60% !important; /* 40% width for better layout */
+            width: 60% !important; /* Adjust width for better layout */
             height: 400px !important; /* Fixed height for charts */
         }
         #subjectFields {
@@ -67,6 +98,9 @@
         }
         .subject-field input {
             margin-right: 5px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
         form {
             margin-bottom: 20px;
@@ -80,49 +114,89 @@
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h2>Student Results</h2>
-    
-    <form id="addStudentForm">
-        <input type="text" id="studentName" placeholder="Student Name" required>
-        <div id="subjectFields">
-            <div class="subject-field">
-                <input type="text" placeholder="Subject Name" class="subjectName" required>
-                <input type="number" placeholder="Grade" class="subjectGrade" min="0" max="5" step="0.1" required>
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <a href="#" onclick="showAddStudentForm()">Add Student</a>
+        <a href="#" onclick="showResultsTable()">View Results</a>
+        <!-- <a href="#" onclick="downloadPDF()">Download PDF</a> -->
+    </div>
+    <div class="content">
+        <h2>Student Results</h2>
+        
+        <form id="addStudentForm" class="hidden">
+            <!-- <input type="text" id="studentName" placeholder="Student Name" required> -->
+            <select name="" id="studentName">
+                <option value="">Select Student</option>
+                <option value="Student 1">Student 1</option>
+                <option value="Student 2">Student 2</option>
+                <option value="Student 3">Student 3</option>
+                <option value="Student 4">Student 4</option>
+                <option value="Student 5">Student 5</option>
+            </select>
+            <div id="subjectFields">
+                <div class="subject-field">
+                    <input type="text" placeholder="Subject Name" class="subjectName" required>
+                    <input type="number" placeholder="Grade" class="subjectGrade" min="0" max="100" step="1" required>
+                </div>
             </div>
+            <button type="button" class="button" onclick="addSubjectField()">Add Subject</button>
+            <button type="button" class="button" onclick="addStudent()">Add Student</button>
+            <a href="home.html">Home</a>
+            <!-- <a href="results.html">View Results</a> -->
+            <a href="degrees.html">Degrees Calculator</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="about.html">About Us</a>
+            <a href="excel.html">Degrees and grades</a>
+        </form>
+        
+        <table id="resultsTable" class="hidden">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Subjects</th>
+                    <th>Grades</th>
+                    <th>Average Grade %</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Student data will be populated here -->
+            </tbody>
+        </table>
+
+        <button id="loadMoreButton" class="button hidden" onclick="loadMoreStudents()">See More</button>
+
+        <div id="chartContainer" class="hidden">
+            <canvas id="subjectPieChart"></canvas>
+            <canvas id="subjectBarChart"></canvas>
         </div>
-        <button type="button" class="button" onclick="addSubjectField()">Add Subject</button>
-        <button type="button" class="button" onclick="addStudent()">Add Student</button>
-    </form>
-    
-    <table id="resultsTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Subjects</th>
-                <th>Grades</th>
-                <th>Average Grade</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Student data will be populated here -->
-        </tbody>
-    </table>
-
-    <button id="loadMoreButton" class="button hidden" onclick="loadMoreStudents()">See More</button>
-
-    <div id="chartContainer">
-        <canvas id="subjectPieChart"></canvas>
-        <canvas id="subjectBarChart"></canvas>
     </div>
 
     <script>
         let students = JSON.parse(localStorage.getItem('students')) || {};
         let displayedStudents = [];
         let currentIndex = 0;
+
+        function showAddStudentForm() {
+            document.getElementById('addStudentForm').classList.remove('hidden');
+            document.getElementById('resultsTable').classList.add('hidden');
+            document.getElementById('chartContainer').classList.add('hidden');
+        }
+
+        function showResultsTable() {
+            document.getElementById('addStudentForm').classList.add('hidden');
+            document.getElementById('resultsTable').classList.remove('hidden');
+            document.getElementById('chartContainer').classList.add('hidden');
+            loadMoreStudents();
+        }
+
+        function downloadPDF() {
+            generatePDF();
+        }
 
         function generateDummyData() {
             const subjectsList = ['Math', 'Science', 'History', 'English', 'Art', 'PE', 'Biology', 'Chemistry', 'Physics', 'Music'];
@@ -154,7 +228,7 @@
             const grades = Object.values(subjects);
             const totalGrade = grades.reduce((sum, grade) => sum + gradeToNumber(grade), 0);
             const count = grades.filter(grade => grade !== null).length;
-            return count ? (totalGrade / count).toFixed(2) : 0;
+            return count ? (totalGrade / count).toFixed(0)+"%" : 0;
         }
 
         function renderResultsTable() {
@@ -328,6 +402,47 @@
                 '#3CFFCE', '#CE3CFF', '#FFCE3C'
             ];
             return colors[index % colors.length];
+        }
+
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add Title
+            doc.text("Student Results", 20, 10);
+            doc.setFontSize(12);
+            doc.text("Here are the student results including the average grades.", 20, 20);
+
+            // Add Data Table
+            doc.autoTable({
+                head: [['Name', 'Subjects', 'Grades', 'Average Grade']],
+                body: displayedStudents.map(studentId => {
+                    const student = students[studentId];
+                    const subjectsWithGrades = Object.keys(student.subjects)
+                        .map(subject => `${subject}: ${student.subjects[subject] || 'No Data'}`)
+                        .join(', ');
+                    const avgGrade = calculateAverageGrade(student.subjects);
+                    return [student.name, Object.keys(student.subjects).join(', '), subjectsWithGrades, avgGrade];
+                }),
+                startY: 30,
+            });
+
+            // Add Charts as Images
+            await addChartToPDF(doc, 'subjectPieChart', 'Average Grades by Subject (Pie Chart)', 30);
+            await addChartToPDF(doc, 'subjectBarChart', 'Average Grades by Subject (Bar Chart)', doc.autoTable.previous.finalY + 20);
+
+            doc.save("student_results.pdf");
+        }
+
+        async function addChartToPDF(doc, chartId, title, startY) {
+            return new Promise((resolve) => {
+                const canvas = document.getElementById(chartId);
+                html2canvas(canvas).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    doc.addImage(imgData, 'PNG', 20, startY, 180, 100); // Add image to PDF
+                    resolve();
+                });
+            });
         }
 
         // Initialize data
