@@ -328,10 +328,12 @@
                 <option value="Student 4">Student 4</option>
                 <option value="Student 5">Student 5</option>
             </select>
-            <input type="number" id="midterm" placeholder="Midterm Grade (0-30)" required min="0" max="100">
-            <input type="number" id="final" placeholder="Final Grade (0-50)" required min="0" max="100">
-            <input type="number" id="quiz" placeholder="Quiz Grade (0-10)" required min="0" max="100">
-            <input type="number" id="assignments" placeholder="Assignments Grade (0-10)" required min="0" max="100">
+            <input type="number" id="midterm" placeholder="assignment Grade (0-15)" required min="0" max="15">
+            <input type="number" id="midterm" placeholder="assignment2 Grade (0-10)" required min="0" max="15">
+            <input type="number" id="midterm" placeholder="Midterm Grade (0-10)" required min="0" max="100">
+            <input type="number" id="quiz" placeholder="Quiz Grade (0-5)" required min="0" max="100">
+            <input type="number" id="assignments" placeholder="Lab Grade (0-20)" required min="0" max="100">
+            <input type="number" id="final" placeholder="Final Grade (0-40)" required min="0" max="100">
             <button onclick="calculateGrades()">Calculate</button>
 
             <div class="result" id="result"></div>

@@ -112,28 +112,31 @@
         .hidden {
             display: none;
         }
+        /* New styles for edit buttons */
+        .edit-button {
+            background-color: #ffc107;
+            color: black;
+        }
+        .edit-button:hover {
+            background-color: #e0a800;
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="sidebar">
         <h2>Menu</h2>
         <a href="#" onclick="showAddStudentForm()">Add Student</a>
-        <a href="#" onclick="showResultsTable()">View Results</a><a href="home.html">Home</a>
-        <!-- <a href="results.html">View Results</a> -->
+        <a href="#" onclick="showResultsTable()">View Results</a>
+        <a href="home.html">Home</a>
         <a href="degrees.html">Degrees Calculator</a>
         <a href="contact.html">Contact Us</a>
         <a href="about.html">About Us</a>
         <a href="excel.html">Degrees and grades</a>
-        <!-- <a href="#" onclick="downloadPDF()">Download PDF</a> -->
     </div>
     <div class="content">
         <h2>Student Results</h2>
         
         <form id="addStudentForm" class="hidden">
-            <!-- <input type="text" id="studentName" placeholder="Student Name" required> -->
             <select name="" id="studentName">
                 <option value="">Select Student</option>
                 <option value="Student 1">Student 1</option>
@@ -141,16 +144,26 @@
                 <option value="Student 3">Student 3</option>
                 <option value="Student 4">Student 4</option>
                 <option value="Student 5">Student 5</option>
+                <option value="Student 6">Student 6</option>
+                <option value="Student 7">Student 7</option>
+                <option value="Student 8">Student 8</option>
+                <option value="Student 9">Student 9</option>
+                <option value="Student 10">Student 10</option>
+                <option value="Student 11">Student 11</option>
+                <option value="Student 12">Student 12</option>
+                <option value="Student 13">Student 13</option>
             </select>
             <div id="subjectFields">
                 <div class="subject-field">
                     <input type="text" placeholder="Subject Name" class="subjectName" required>
-                    <input type="number" placeholder="Grade" class="subjectGrade" min="0" max="100" step="1" required>
+                    <input type="number" placeholder="Quiz Grade" class="quizGrade" min="0" max="100" step="1" required>
+                    <input type="number" placeholder="Lab Grade" class="labGrade" min="0" max="100" step="1" required>
+                    <input type="number" placeholder="Midterm Grade" class="midtermGrade" min="0" max="100" step="1" required>
+                    <input type="number" placeholder="Final Grade" class="finalGrade" min="0" max="100" step="1" required>
                 </div>
             </div>
             <button type="button" class="button" onclick="addSubjectField()">Add Subject</button>
             <button type="button" class="button" onclick="addStudent()">Add Student</button>
-            
         </form>
         
         <table id="resultsTable" class="hidden">
@@ -177,7 +190,113 @@
     </div>
 
     <script>
-        let students = JSON.parse(localStorage.getItem('students')) || {};
+        let students = {
+            student1: {
+                name: "Student 1",
+                subjects: {
+                    'Math': { quiz: 80, lab: 85, midterm: 78, final: 82 },
+                    'Science': { quiz: 90, lab: 88, midterm: 92, final: 95 },
+                    'History': { quiz: 75, lab: 80, midterm: 78, final: 82 }
+                }
+            },
+            student2: {
+                name: "Student 2",
+                subjects: {
+                    'Math': { quiz: 70, lab: 75, midterm: 72, final: 74 },
+                    'Science': { quiz: 80, lab: 82, midterm: 84, final: 81 },
+                    'History': { quiz: 88, lab: 90, midterm: 86, final: 87 }
+                }
+            },
+            student3: {
+                name: "Student 3",
+                subjects: {
+                    'Math': { quiz: 85, lab: 90, midterm: 88, final: 91 },
+                    'Science': { quiz: 78, lab: 80, midterm: 75, final: 80 },
+                    'History': { quiz: 82, lab: 85, midterm: 83, final: 84 }
+                }
+            },
+            student4: {
+                name: "Student 4",
+                subjects: {
+                    'Math': { quiz: 92, lab: 90, midterm: 91, final: 93 },
+                    'Science': { quiz: 88, lab: 87, midterm: 85, final: 89 },
+                    'History': { quiz: 81, lab: 80, midterm: 84, final: 82 }
+                }
+            },
+            student5: {
+                name: "Student 5",
+                subjects: {
+                    'Math': { quiz: 76, lab: 78, midterm: 80, final: 82 },
+                    'Science': { quiz: 84, lab: 83, midterm: 85, final: 87 },
+                    'History': { quiz: 90, lab: 92, midterm: 89, final: 88 }
+                }
+            },
+            student6: {
+                name: "Student 6",
+                subjects: {
+                    'Math': { quiz: 89, lab: 91, midterm: 87, final: 85 },
+                    'Science': { quiz: 82, lab: 83, midterm: 80, final: 81 },
+                    'History': { quiz: 88, lab: 87, midterm: 85, final: 84 }
+                }
+            },
+            student7: {
+                name: "Student 7",
+                subjects: {
+                    'Math': { quiz: 95, lab: 94, midterm: 96, final: 93 },
+                    'Science': { quiz: 90, lab: 92, midterm: 91, final: 88 },
+                    'History': { quiz: 87, lab: 86, midterm: 88, final: 89 }
+                }
+            },
+            student8: {
+                name: "Student 8",
+                subjects: {
+                    'Math': { quiz: 80, lab: 75, midterm: 82, final: 78 },
+                    'Science': { quiz: 85, lab: 88, midterm: 90, final: 92 },
+                    'History': { quiz: 78, lab: 80, midterm: 76, final: 75 }
+                }
+            },
+            student9: {
+                name: "Student 9",
+                subjects: {
+                    'Math': { quiz: 70, lab: 65, midterm: 68, final: 72 },
+                    'Science': { quiz: 78, lab: 80, midterm: 75, final: 74 },
+                    'History': { quiz: 85, lab: 90, midterm: 88, final: 84 }
+                }
+            },
+            student10: {
+                name: "Student 10",
+                subjects: {
+                    'Math': { quiz: 88, lab: 90, midterm: 89, final: 85 },
+                    'Science': { quiz: 80, lab: 78, midterm: 82, final: 81 },
+                    'History': { quiz: 84, lab: 83, midterm: 85, final: 87 }
+                }
+            },
+            student11: {
+                name: "Student 11",
+                subjects: {
+                    'Math': { quiz: 79, lab: 82, midterm: 80, final: 81 },
+                    'Science': { quiz: 76, lab: 78, midterm: 75, final: 74 },
+                    'History': { quiz: 72, lab: 75, midterm: 74, final: 70 }
+                }
+            },
+            student12: {
+                name: "Student 12",
+                subjects: {
+                    'Math': { quiz: 85, lab: 90, midterm: 88, final: 91 },
+                    'Science': { quiz: 80, lab: 82, midterm: 85, final: 87 },
+                    'History': { quiz: 77, lab: 80, midterm: 78, final: 79 }
+                }
+            },
+            student13: {
+                name: "Student 13",
+                subjects: {
+                    'Math': { quiz: 83, lab: 85, midterm: 82, final: 84 },
+                    'Science': { quiz: 89, lab: 90, midterm: 87, final: 88 },
+                    'History': { quiz: 92, lab: 91, midterm: 90, final: 89 }
+                }
+            }
+        };
+
         let displayedStudents = [];
         let currentIndex = 0;
 
@@ -194,80 +313,9 @@
             loadMoreStudents();
         }
 
-        function downloadPDF() {
-            generatePDF();
-        }
-
-        function generateDummyData() {
-            const subjectsList = ['Math', 'Science', 'History', 'English', 'Art', 'PE', 'Biology', 'Chemistry', 'Physics', 'Music'];
-            for (let i = 1; i <= 50; i++) {
-                const name = `Student ${i}`;
-                const subjects = {};
-                const numSubjects = Math.floor(Math.random() * 3) + 3;
-                const selectedSubjects = [];
-
-                while (selectedSubjects.length < numSubjects) {
-                    const randomSubject = subjectsList[Math.floor(Math.random() * subjectsList.length)];
-                    if (!selectedSubjects.includes(randomSubject)) {
-                        selectedSubjects.push(randomSubject);
-                        subjects[randomSubject] = (Math.random() * 5).toFixed(1);
-                    }
-                }
-
-                const studentId = new Date().getTime() + i;
-                students[studentId] = { name, subjects };
-            }
-            localStorage.setItem('students', JSON.stringify(students));
-        }
-
-        function gradeToNumber(grade) {
-            return grade === null ? 0 : grade;
-        }
-
-        function calculateAverageGrade(subjects) {
-            const grades = Object.values(subjects);
-            const totalGrade = grades.reduce((sum, grade) => sum + gradeToNumber(grade), 0);
-            const count = grades.filter(grade => grade !== null).length;
-            return count ? (totalGrade / count).toFixed(0)+"%" : 0;
-        }
-
-        function renderResultsTable() {
-            const resultsTableBody = document.querySelector('#resultsTable tbody');
-            resultsTableBody.innerHTML = '';
-
-            displayedStudents.forEach(studentId => {
-                const student = students[studentId];
-                const subjectsWithGrades = Object.keys(student.subjects)
-                    .map(subject => `${subject}: ${student.subjects[subject] || 'No Data'}`)
-                    .join(', ');
-
-                const avgGrade = calculateAverageGrade(student.subjects);
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${student.name}</td>
-                    <td>${Object.keys(student.subjects).join(', ')}</td>
-                    <td>${subjectsWithGrades}</td>
-                    <td>${avgGrade}</td>
-                    <td><button class="button" onclick="deleteStudent('${studentId}')">Delete</button></td>
-                `;
-                resultsTableBody.appendChild(row);
-            });
-
-            updateCharts();
-            updateLoadMoreButton();
-        }
-
-        function updateLoadMoreButton() {
-            const loadMoreButton = document.getElementById('loadMoreButton');
-            loadMoreButton.style.display = (currentIndex < Object.keys(students).length) ? 'block' : 'none';
-        }
-
-        function loadMoreStudents() {
-            const studentIds = Object.keys(students);
-            const nextBatch = studentIds.slice(currentIndex, currentIndex + 5);
-            displayedStudents = displayedStudents.concat(nextBatch);
-            currentIndex += 5;
-            renderResultsTable();
+        function clearForm() {
+            document.getElementById('studentName').value = '';
+            document.querySelectorAll('.subject-field').forEach(field => field.remove());
         }
 
         function addSubjectField() {
@@ -276,7 +324,10 @@
             newField.classList.add('subject-field');
             newField.innerHTML = `
                 <input type="text" placeholder="Subject Name" class="subjectName" required>
-                <input type="number" placeholder="Grade" class="subjectGrade" min="0" max="5" step="0.1" required>
+                <input type="number" placeholder="Quiz Grade" class="quizGrade" min="0" max="100" step="1" required>
+                <input type="number" placeholder="Lab Grade" class="labGrade" min="0" max="100" step="1" required>
+                <input type="number" placeholder="Midterm Grade" class="midtermGrade" min="0" max="100" step="1" required>
+                <input type="number" placeholder="Final Grade" class="finalGrade" min="0" max="100" step="1" required>
             `;
             subjectFields.appendChild(newField);
         }
@@ -285,173 +336,99 @@
             const name = document.getElementById('studentName').value;
             const subjects = {};
             const subjectNames = document.querySelectorAll('.subjectName');
-            const subjectGrades = document.querySelectorAll('.subjectGrade');
+            const quizGrades = document.querySelectorAll('.quizGrade');
+            const labGrades = document.querySelectorAll('.labGrade');
+            const midtermGrades = document.querySelectorAll('.midtermGrade');
+            const finalGrades = document.querySelectorAll('.finalGrade');
 
             subjectNames.forEach((subject, index) => {
                 const subjectName = subject.value.trim();
-                const subjectGrade = parseFloat(subjectGrades[index].value);
+                const quizGrade = parseFloat(quizGrades[index].value);
+                const labGrade = parseFloat(labGrades[index].value);
+                const midtermGrade = parseFloat(midtermGrades[index].value);
+                const finalGrade = parseFloat(finalGrades[index].value);
+
                 if (subjectName) {
-                    subjects[subjectName] = subjectGrade;
+                    subjects[subjectName] = {
+                        quiz: quizGrade,
+                        lab: labGrade,
+                        midterm: midtermGrade,
+                        final: finalGrade
+                    };
                 }
             });
 
-            const studentId = new Date().getTime();
-            students[studentId] = { name, subjects };
-            localStorage.setItem('students', JSON.stringify(students));
-            document.getElementById('studentName').value = '';
-            document.querySelectorAll('.subject-field').forEach(field => field.remove());
-            loadMoreStudents();
+            if (name && Object.keys(subjects).length > 0) {
+                const studentId = `student_${Date.now()}`;
+                students[studentId] = { name, subjects };
+                localStorage.setItem('students', JSON.stringify(students));
+                clearForm();
+                loadMoreStudents();
+            } else {
+                alert("Please fill in all fields.");
+            }
+        }
+
+        function calculateAverageGrade(subjects) {
+            let total = 0;
+            let count = 0;
+            for (const subject of Object.values(subjects)) {
+                total += (subject.quiz + subject.lab + subject.midterm + subject.final) / 4;
+                count++;
+            }
+            return count > 0 ? (total / count).toFixed(2) : 0;
+        }
+
+        function loadMoreStudents() {
+            const resultsTableBody = document.querySelector('#resultsTable tbody');
+            resultsTableBody.innerHTML = ''; // Clear existing rows
+            const studentsKeys = Object.keys(students);
+            
+            studentsKeys.forEach(studentId => {
+                const student = students[studentId];
+                const subjectsWithGrades = Object.keys(student.subjects).map(subject => {
+                    const { quiz, lab, midterm, final } = student.subjects[subject];
+                    return `${subject}: Quiz: ${quiz}, Lab: ${lab}, Midterm: ${midterm}, Final: ${final}`;
+                }).join(', ');
+
+                const avgGrade = calculateAverageGrade(student.subjects);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${Object.keys(student.subjects).join(', ')}</td>
+                    <td>${subjectsWithGrades}</td>
+                    <td>${avgGrade}</td>
+                    <td>
+                        <button class="button edit-button" onclick="editStudent('${studentId}')">Edit</button>
+                        <button class="button" onclick="deleteStudent('${studentId}')">Delete</button>
+                    </td>
+                `;
+                resultsTableBody.appendChild(row);
+            });
+        }
+
+        function editStudent(studentId) {
+            const student = students[studentId];
+            document.getElementById('studentName').value = student.name;
+            clearForm(); // Clear existing subject fields
+            
+            // Populate the form with the student's subjects and grades
+            Object.keys(student.subjects).forEach(subject => {
+                addSubjectField(); // Function to add a subject input field
+                const subjectField = document.querySelector('.subject-field:last-child');
+                subjectField.querySelector('.subjectName').value = subject;
+                subjectField.querySelector('.quizGrade').value = student.subjects[subject].quiz;
+                subjectField.querySelector('.labGrade').value = student.subjects[subject].lab;
+                subjectField.querySelector('.midtermGrade').value = student.subjects[subject].midterm;
+                subjectField.querySelector('.finalGrade').value = student.subjects[subject].final;
+            });
         }
 
         function deleteStudent(studentId) {
             delete students[studentId];
             localStorage.setItem('students', JSON.stringify(students));
-            displayedStudents = [];
-            currentIndex = 0;
             loadMoreStudents();
         }
-
-        function updateCharts() {
-            const subjectGrades = {};
-            for (const studentId in students) {
-                const student = students[studentId];
-                for (const subject in student.subjects) {
-                    if (!subjectGrades[subject]) {
-                        subjectGrades[subject] = [];
-                    }
-                    subjectGrades[subject].push(student.subjects[subject]);
-                }
-            }
-
-            const subjectLabels = Object.keys(subjectGrades);
-            const subjectAverages = subjectLabels.map(subject => {
-                return (subjectGrades[subject].reduce((sum, grade) => sum + gradeToNumber(grade), 0) / subjectGrades[subject].length).toFixed(2);
-            });
-
-            const colors = subjectLabels.map((_, index) => generateColor(index));
-
-            // Pie Chart
-            const ctxPie = document.getElementById('subjectPieChart').getContext('2d');
-            new Chart(ctxPie, {
-                type: 'pie',
-                data: {
-                    labels: subjectLabels,
-                    datasets: [{
-                        label: 'Average Grades by Subject',
-                        data: subjectAverages,
-                        backgroundColor: colors,
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Average Grades by Subject (Pie Chart)',
-                        }
-                    }
-                },
-            });
-
-            // Bar Chart
-            const ctxBar = document.getElementById('subjectBarChart').getContext('2d');
-            new Chart(ctxBar, {
-                type: 'bar',
-                data: {
-                    labels: subjectLabels,
-                    datasets: [{
-                        label: 'Average Grades',
-                        data: subjectAverages,
-                        backgroundColor: colors,
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 5,
-                            title: {
-                                display: true,
-                                text: 'Grades',
-                            },
-                        },
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Average Grades by Subject (Bar Chart)',
-                        }
-                    }
-                },
-            });
-        }
-
-        function generateColor(index) {
-            const colors = [
-                '#FF6384', '#36A2EB', '#FFCE56',
-                '#4BC0C0', '#9966FF', '#FF9F40',
-                '#FF3C8E', '#3CFF8E', '#8E3CFF',
-                '#8EFF3C', '#FFC03C', '#3C8EFF',
-                '#3CFFCE', '#CE3CFF', '#FFCE3C'
-            ];
-            return colors[index % colors.length];
-        }
-
-        async function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            // Add Title
-            doc.text("Student Results", 20, 10);
-            doc.setFontSize(12);
-            doc.text("Here are the student results including the average grades.", 20, 20);
-
-            // Add Data Table
-            doc.autoTable({
-                head: [['Name', 'Subjects', 'Grades', 'Average Grade']],
-                body: displayedStudents.map(studentId => {
-                    const student = students[studentId];
-                    const subjectsWithGrades = Object.keys(student.subjects)
-                        .map(subject => `${subject}: ${student.subjects[subject] || 'No Data'}`)
-                        .join(', ');
-                    const avgGrade = calculateAverageGrade(student.subjects);
-                    return [student.name, Object.keys(student.subjects).join(', '), subjectsWithGrades, avgGrade];
-                }),
-                startY: 30,
-            });
-
-            // Add Charts as Images
-            await addChartToPDF(doc, 'subjectPieChart', 'Average Grades by Subject (Pie Chart)', 30);
-            await addChartToPDF(doc, 'subjectBarChart', 'Average Grades by Subject (Bar Chart)', doc.autoTable.previous.finalY + 20);
-
-            doc.save("student_results.pdf");
-        }
-
-        async function addChartToPDF(doc, chartId, title, startY) {
-            return new Promise((resolve) => {
-                const canvas = document.getElementById(chartId);
-                html2canvas(canvas).then(canvas => {
-                    const imgData = canvas.toDataURL('image/png');
-                    doc.addImage(imgData, 'PNG', 20, startY, 180, 100); // Add image to PDF
-                    resolve();
-                });
-            });
-        }
-
-        // Initialize data
-        if (Object.keys(students).length === 0) {
-            generateDummyData();
-        }
-
-        // Load initial students
-        loadMoreStudents();
     </script>
 </body>
 </html>
