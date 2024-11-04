@@ -137,19 +137,8 @@
                 <h4>Your Degrees:</h4>
                 <ul id="degreesList"></ul>
                 <h4>Your Grades:</h4>
-                <h5>Mid-Term Grades:</h5>
-                <ul id="midTermList"></ul>
-                <h5>Final Grades:</h5>
-                <ul id="finalList"></ul>
-                <h5>Quizzes:</h5>
-                <ul id="quizzesList"></ul>
-                <h5>Assignments:</h5>
-                <ul id="assignmentsList"></ul>
-                <h5>Lab:</h5>
-                <ul id="labList"></ul>
+                <ul id="gradesList"></ul>
                 <h4>Average Grade: <span id="averageDisplay"></span>%</h4>
-                <h4>Percentage: <span id="percentageDisplay"></span>%</h4>
-                <div id="additionalInfo"></div>
                 <div id="successMessage" class="success-message"></div>
                 <div id="failMessage" class="fail-message"></div>
             </div>
@@ -178,14 +167,12 @@
             number: '200',
             degrees: ['B.Sc. in Biology'],
             grades: {
-                midTerm: { Math: 10, Science: 12, English: 13 }, // Max 15
-                final: { Math: 30, Science: 35, English: 40 }, // Max 40
-                quizzes: { Math: 5, Science: 4, English: 3 }, // Max 5
-                assignments: { Math: 8, Science: 9, English: 10 }, // Max 10
-                additionalAssignments: { Math: 8, Science: 9, English: 10 }, // Max 10
-                lab: { Math: 15, Science: 20, English: 18 } // Max 20
-            },
-            subjects: { Math: 100, Science: 87.5, English: 75 }
+                midTerm: { Math: 10, Science: 12, English: 13 },
+                final: { Math: 30, Science: 35, English: 40 },
+                quizzes: { Math: 5, Science: 4, English: 3 },
+                assignments: { Math: 8, Science: 9, English: 10 },
+                lab: { Math: 15, Science: 20, English: 18 }
+            }
         },
         'Name 2': {
             number: '201',
@@ -195,10 +182,8 @@
                 final: { Math: 35, Science: 32, English: 38 },
                 quizzes: { Math: 3, Science: 4, English: 5 },
                 assignments: { Math: 7, Science: 8, English: 10 },
-                additionalAssignments: { Math: 9, Science: 7, English: 6 },
                 lab: { Math: 18, Science: 20, English: 15 }
-            },
-            subjects: { Math: 50, Science: 87.5, English: 80 }
+            }
         },
         'Name 3': {
             number: '202',
@@ -208,13 +193,153 @@
                 final: { Math: 40, Science: 40, English: 38 },
                 quizzes: { Math: 5, Science: 5, English: 5 },
                 assignments: { Math: 10, Science: 9, English: 8 },
-                additionalAssignments: { Math: 10, Science: 10, English: 10 },
                 lab: { Math: 20, Science: 20, English: 20 }
-            },
-            subjects: { Math: 100, Science: 97.5, English: 95 }
+            }
         },
-        // ... Add more student data as needed
+        'Name 4': {
+            number: '203',
+            degrees: ['B.Sc. in Mathematics'],
+            grades: {
+                midTerm: { Math: 8, Science: 7, English: 6 },
+                final: { Math: 10, Science: 12, English: 9 },
+                quizzes: { Math: 2, Science: 1, English: 3 },
+                assignments: { Math: 4, Science: 5, English: 2 },
+                lab: { Math: 10, Science: 12, English: 10 }
+            }
+        },
+        'Name 5': {
+            number: '204',
+            degrees: ['B.Sc. in Biology'],
+            grades: {
+                midTerm: { Math: 12, Science: 11, English: 13 },
+                final: { Math: 33, Science: 30, English: 35 },
+                quizzes: { Math: 3, Science: 4, English: 3 },
+                assignments: { Math: 9, Science: 8, English: 10 },
+                lab: { Math: 18, Science: 19, English: 20 }
+            }
+        },
+        'Name 6': {
+            number: '205',
+            degrees: ['B.Sc. in Chemistry'],
+            grades: {
+                midTerm: { Math: 5, Science: 7, English: 6 },
+                final: { Math: 10, Science: 12, English: 9 },
+                quizzes: { Math: 1, Science: 1, English: 2 },
+                assignments: { Math: 2, Science: 3, English: 4 },
+                lab: { Math: 5, Science: 6, English: 7 }
+            }
+        },
+        'Name 7': {
+            number: '206',
+            degrees: ['B.Sc. in Physics'],
+            grades: {
+                midTerm: { Math: 15, Science: 15, English: 15 },
+                final: { Math: 40, Science: 38, English: 35 },
+                quizzes: { Math: 5, Science: 5, English: 5 },
+                assignments: { Math: 10, Science: 10, English: 10 },
+                lab: { Math: 20, Science: 20, English: 20 }
+            }
+        },
+        'Name 8': {
+            number: '207',
+            degrees: ['B.Sc. in Mathematics'],
+            grades: {
+                midTerm: { Math: 9, Science: 8, English: 10 },
+                final: { Math: 20, Science: 22, English: 25 },
+                quizzes: { Math: 4, Science: 3, English: 5 },
+                assignments: { Math: 7, Science: 8, English: 6 },
+                lab: { Math: 15, Science: 18, English: 20 }
+            }
+        },
+        'Name 9': {
+            number: '208',
+            degrees: ['B.Sc. in Biology'],
+            grades: {
+                midTerm: { Math: 14, Science: 13, English: 12 },
+                final: { Math: 35, Science: 36, English: 38 },
+                quizzes: { Math: 4, Science: 4, English: 4 },
+                assignments: { Math: 8, Science: 7, English: 9 },
+                lab: { Math: 15, Science: 16, English: 18 }
+            }
+        },
+        'Name 10': {
+            number: '209',
+            degrees: ['B.Sc. in Chemistry'],
+            grades: {
+                midTerm: { Math: 11, Science: 10, English: 9 },
+                final: { Math: 29, Science: 30, English: 27 },
+                quizzes: { Math: 3, Science: 4, English: 2 },
+                assignments: { Math: 6, Science: 5, English: 8 },
+                lab: { Math: 12, Science: 15, English: 14 }
+            }
+        },
+        'Name 11': {
+            number: '210',
+            degrees: ['B.Sc. in Physics'],
+            grades: {
+                midTerm: { Math: 15, Science: 14, English: 13 },
+                final: { Math: 39, Science: 37, English: 38 },
+                quizzes: { Math: 5, Science: 5, English: 5 },
+                assignments: { Math: 10, Science: 9, English: 10 },
+                lab: { Math: 20, Science: 18, English: 20 }
+            }
+        },
+        'Name 12': {
+            number: '211',
+            degrees: ['B.Sc. in Mathematics'],
+            grades: {
+                midTerm: { Math: 6, Science: 5, English: 7 },
+                final: { Math: 10, Science: 9, English: 8 },
+                quizzes: { Math: 2, Science: 1, English: 3 },
+                assignments: { Math: 4, Science: 5, English: 4 },
+                lab: { Math: 5, Science: 6, English: 5 }
+            }
+        },
+        'Name 13': {
+            number: '212',
+            degrees: ['B.Sc. in Biology'],
+            grades: {
+                midTerm: { Math: 13, Science: 14, English: 12 },
+                final: { Math: 36, Science: 34, English: 35 },
+                quizzes: { Math: 5, Science: 4, English: 5 },
+                assignments: { Math: 9, Science: 8, English: 10 },
+                lab: { Math: 18, Science: 20, English: 19 }
+            }
+        },
+        'Name 14': {
+            number: '213',
+            degrees: ['B.Sc. in Chemistry'],
+            grades: {
+                midTerm: { Math: 5, Science: 6, English: 7 },
+                final: { Math: 8, Science: 10, English: 7 },
+                quizzes: { Math: 1, Science: 1, English: 2 },
+                assignments: { Math: 2, Science: 3, English: 4 },
+                lab: { Math: 5, Science: 6, English: 7 }
+            }
+        },
+        'Name 15': {
+            number: '214',
+            degrees: ['B.Sc. in Physics'],
+            grades: {
+                midTerm: { Math: 15, Science: 15, English: 15 },
+                final: { Math: 40, Science: 38, English: 39 },
+                quizzes: { Math: 5, Science: 5, English: 5 },
+                assignments: { Math: 10, Science: 10, English: 10 },
+                lab: { Math: 20, Science: 20, English: 20 }
+            }
+        },
     };
+
+    function getLetterGrade(percentage) {
+        if (percentage >= 90) return 'A+';
+        if (percentage >= 80) return 'A';
+        if (percentage >= 70) return 'B+';
+        if (percentage >= 60) return 'B';
+        if (percentage >= 50) return 'C+';
+        if (percentage >= 40) return 'C';
+        if (percentage >= 30) return 'D';
+        return 'F';
+    }
 
     document.getElementById('submitBtn').addEventListener('click', function() {
         const studentName = document.getElementById('studentName').value.trim();
@@ -222,25 +347,15 @@
         const nameDisplay = document.getElementById('nameDisplay');
         const numberDisplay = document.getElementById('numberDisplay');
         const degreesList = document.getElementById('degreesList');
-        const midTermList = document.getElementById('midTermList');
-        const finalList = document.getElementById('finalList');
-        const quizzesList = document.getElementById('quizzesList');
-        const assignmentsList = document.getElementById('assignmentsList');
-        const labList = document.getElementById('labList');
+        const gradesList = document.getElementById('gradesList');
         const averageDisplay = document.getElementById('averageDisplay');
-        const percentageDisplay = document.getElementById('percentageDisplay');
-        const additionalInfo = document.getElementById('additionalInfo');
         const successMessage = document.getElementById('successMessage');
         const failMessage = document.getElementById('failMessage');
         const errorMessage = document.getElementById('errorMessage');
 
         // Clear previous content
         degreesList.innerHTML = '';
-        midTermList.innerHTML = '';
-        finalList.innerHTML = '';
-        quizzesList.innerHTML = '';
-        assignmentsList.innerHTML = '';
-        labList.innerHTML = '';
+        gradesList.innerHTML = '';
         errorMessage.textContent = '';
         successMessage.textContent = '';
         failMessage.textContent = '';
@@ -259,83 +374,42 @@
                 degreesList.appendChild(li);
             });
 
-            // Populate mid-term grades
-            for (const subject in studentInfo.grades.midTerm) {
+            // Calculate grades and display them
+            let totalAverage = 0;
+            const subjects = ['Math', 'Science', 'English'];
+
+            subjects.forEach(subject => {
+                const midTermScore = studentInfo.grades.midTerm[subject];
+                const finalScore = studentInfo.grades.final[subject];
+                const quizScore = studentInfo.grades.quizzes[subject];
+                const assignmentScore = studentInfo.grades.assignments[subject];
+                const labScore = studentInfo.grades.lab[subject];
+
+                const totalScore = midTermScore + finalScore + quizScore + assignmentScore + labScore;
+                const average = (totalScore / 100) * 100; // Adjusting for total score out of 100
+
                 const li = document.createElement('li');
-                li.textContent = `${subject} Mid-Term: ${studentInfo.grades.midTerm[subject].toFixed(2)}`;
-                midTermList.appendChild(li);
-            }
+                li.textContent = `${subject}: Mid-Term(${midTermScore}), Final(${finalScore}), Quizzes(${quizScore}), Assignments(${assignmentScore}), Lab(${labScore}) - Grade: ${getLetterGrade(average)}`;
+                gradesList.appendChild(li);
 
-            // Populate final grades
-            for (const subject in studentInfo.grades.final) {
-                const li = document.createElement('li');
-                li.textContent = `${subject} Final: ${studentInfo.grades.final[subject].toFixed(2)}`;
-                finalList.appendChild(li);
-            }
+                // Add to overall average
+                totalAverage += average;
+            });
 
-            // Populate quizzes
-            for (const subject in studentInfo.grades.quizzes) {
-                const li = document.createElement('li');
-                li.textContent = `${subject} Quiz: ${studentInfo.grades.quizzes[subject].toFixed(2)}`;
-                quizzesList.appendChild(li);
-            }
+            // Calculate overall average and determine if passed or failed
+            totalAverage /= subjects.length;
+            averageDisplay.textContent = totalAverage.toFixed(2) + '%';
 
-            // Populate assignments
-            for (const subject in studentInfo.grades.assignments) {
-                const li = document.createElement('li');
-                li.textContent = `${subject} Assignment: ${studentInfo.grades.assignments[subject].toFixed(2)}`;
-                assignmentsList.appendChild(li);
-            }
-
-            // Populate additional assignments
-            for (const subject in studentInfo.grades.additionalAssignments) {
-                const li = document.createElement('li');
-                li.textContent = `${subject} Additional Assignment: ${studentInfo.grades.additionalAssignments[subject].toFixed(2)}`;
-                assignmentsList.appendChild(li);
-            }
-
-            // Populate lab grades
-            for (const subject in studentInfo.grades.lab) {
-                const li = document.createElement('li');
-                li.textContent = `${subject} Lab: ${studentInfo.grades.lab[subject].toFixed(2)}`;
-                labList.appendChild(li);
-            }
-
-            // Calculate total and average
-            const totalGrades = {
-                midTerm: 15,
-                final: 40,
-                quizzes: 5,
-                assignments: 10,
-                additionalAssignments: 10,
-                lab: 20
-            };
-
-            const maxPoints = Object.values(totalGrades).reduce((acc, val) => acc + val * Object.keys(studentInfo.grades.midTerm).length, 0);
-            const totalPoints = Object.entries(studentInfo.grades).reduce((acc, [type, subjects]) => {
-                return acc + Object.values(subjects).reduce((sum, score) => sum + score, 0);
-            }, 0);
-
-            const average = Math.min((totalPoints / maxPoints) * 100, 100); // Ensure it doesn't exceed 100
-
-            // Display average and percentage
-            averageDisplay.textContent = average.toFixed(2);
-            percentageDisplay.textContent = average.toFixed(2);
-
-            // Additional information about grades
-            additionalInfo.innerHTML = `<strong>Your Grades:</strong> Math: ${studentInfo.subjects.Math.toFixed(2)}%, Science: ${studentInfo.subjects.Science.toFixed(2)}%, English: ${studentInfo.subjects.English.toFixed(2)}%`;
-
-            // Success or fail message
-            if (average >= 60) {
-                successMessage.textContent = "Congratulations! You have successfully passed your courses.";
+            if (totalAverage < 50) {
+                failMessage.textContent = 'You have failed the course.';
             } else {
-                failMessage.textContent = "Unfortunately, you have not passed. Please seek guidance for improvement.";
+                successMessage.textContent = 'Congratulations! You have passed the course.';
             }
 
             // Show the modal
             $('#studentModal').modal('show');
         } else {
-            errorMessage.textContent = "Error: Student name or number is incorrect! Please enter valid details.";
+            errorMessage.textContent = 'Invalid student name or number. Please try again.';
         }
     });
 </script>
