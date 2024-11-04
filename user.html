@@ -99,7 +99,7 @@
     <div>
         <h2>User Dashboard</h2>
         <a href="home.html">Home</a>
-        <a href="results.html">View Results</a>
+        <!-- <a href="results.html">View Results</a> -->
         <!-- <a href="degrees.html">Degrees Calculator</a> -->
         <a href="contact.html">Contact Us</a>
         <a href="about.html">About Us</a>
@@ -107,7 +107,7 @@
     </div>
     <div>
         <button id="darkModeToggle" class="dark-mode-toggle">Enable Dark Mode</button>
-        <a href="login.html" class="logout-btn">Logout</a>
+        <a href="index.html" class="logout-btn">Logout</a>
     </div>
 </div>
 
@@ -121,7 +121,7 @@
         <label for="studentNumber">Enter your student number (200-250):</label>
         <input type="number" class="form-control" id="studentNumber" placeholder="Your Student Number">
     </div>
-    <button id="submitBtn" class="btn btn-primary">Submit</button>
+    <button id="submitBtn" class="btn btn-primary">View Results</button>
     <div id="errorMessage" class="error-message"></div>
 </div>
 
@@ -249,28 +249,28 @@
             // Populate mid-term grades
             studentInfo.midTermGrades.forEach((grade, index) => {
                 const li = document.createElement('li');
-                li.textContent = `Mid-Term ${index + 1}: ${grade.toFixed(2)}%`;
+                li.textContent = `Mid-Term ${index + 1}: ${grade.toFixed(2)}`;
                 midTermList.appendChild(li);
             });
 
             // Populate final grades
             studentInfo.finalGrades.forEach((grade, index) => {
                 const li = document.createElement('li');
-                li.textContent = `Final ${index + 1}: ${grade.toFixed(2)}%`;
+                li.textContent = `Final ${index + 1}: ${grade.toFixed(2)}`;
                 finalList.appendChild(li);
             });
 
             // Populate quizzes
             studentInfo.quizzes.forEach((grade, index) => {
                 const li = document.createElement('li');
-                li.textContent = `Quiz ${index + 1}: ${grade.toFixed(2)}%`;
+                li.textContent = `Quiz ${index + 1}: ${grade.toFixed(2)}`;
                 quizzesList.appendChild(li);
             });
 
             // Populate assignments
             studentInfo.assignments.forEach((grade, index) => {
                 const li = document.createElement('li');
-                li.textContent = `Assignment ${index + 1}: ${grade.toFixed(2)}%`;
+                li.textContent = `Assignment ${index + 1}: ${grade.toFixed(2)}`;
                 assignmentsList.appendChild(li);
             });
 
