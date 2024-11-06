@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Students</title>
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: #007bff;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f1f1f1;
+            color: #007bff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Button Styling */
+        .edit-btn,
+        .delete-btn,
+        .update-degrees-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .edit-btn:hover,
+        .update-degrees-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+        }
+
+        /* Form Styling */
+        .subject-form {
+            margin-bottom: 20px;
+        }
+
+        .subject-form input {
+            padding: 8px 12px;
+            margin: 6px;
+            width: calc(33% - 16px);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .subject-form label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .subject-container {
+            margin-bottom: 20px;
+        }
+
+        .subject-container input {
+            width: 80px;
+        }
+
+        /* Save Button */
+        .add-subject-degree-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        .add-subject-degree-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Teacher's Degrees Management</h2>
+
+    <h3>Student List</h3>
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Students will be dynamically populated here -->
+        </tbody>
+    </table>
+
+    <!-- Modal for updating subjects and degrees -->
+    <div id="updateDegreesModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Update Subjects and Degrees for <span id="modal-student-name"></span></h3>
+
+            <div id="subjectsForm"></div>
+
+            <button onclick="saveSubjectsAndDegrees()" class="add-subject-degree-btn">Save Changes</button>
+        </div>
+    </div>
+
+    <script>
+        // Retrieve students from localStorage
+        const students = JSON.parse(localStorage.getItem('students')) || {};
+
+        // Variables for modal
+        let currentStudentId = null;
+
+        // Function to populate the student table
+        function populateStudentTable() {
+            const studentTable = document.getElementById('studentTable').getElementsByTagName('tbody')[0];
+            studentTable.innerHTML = '';  // Clear existing rows
+
+            // Loop through the students and display them
+            for (let id in students) {
+                const student = students[id];
+                let row = studentTable.insertRow();
+                row.insertCell(0).textContent = student.name;
+
+                let actionsCell = row.insertCell(1);
+
+                // Create Edit button
+                // const editBtn = document.createElement('button');
+                // editBtn.textContent = 'Edit';
+                // editBtn.classList.add('edit-btn');
+                // editBtn.onclick = () => editStudent(id);
+                // actionsCell.appendChild(editBtn);
+
+                // Create Update Subjects and Degrees button
+                const updateDegreesBtn = document.createElement('button');
+                updateDegreesBtn.textContent = 'Update Subjects & Degrees';
+                updateDegreesBtn.classList.add('update-degrees-btn');
+                updateDegreesBtn.onclick = () => openUpdateDegreesModal(id);
+                actionsCell.appendChild(updateDegreesBtn);
+
+                // Create Delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.classList.add('delete-btn');
+                deleteBtn.onclick = () => deleteStudent(id);
+                actionsCell.appendChild(deleteBtn);
+            }
+        }
+
+        // Open the modal to update subjects and degrees
+        function openUpdateDegreesModal(id) {
+            currentStudentId = id;
+            const student = students[id];
+            document.getElementById('modal-student-name').textContent = student.name;
+
+            // Generate subject forms for Math, Science, and History
+            const subjectsForm = document.getElementById('subjectsForm');
+            subjectsForm.innerHTML = '';  // Clear existing forms
+
+            const subjects = ['Math'];
+            subjects.forEach(subject => {
+                const subjectContainer = document.createElement('div');
+                subjectContainer.classList.add('subject-container');
+
+                const label = document.createElement('label');
+                label.textContent = subject;
+                subjectContainer.appendChild(label);
+
+                const midtermInput = document.createElement('input');
+                midtermInput.type = 'number';
+                midtermInput.placeholder = 'Midterm';
+                midtermInput.value = student[subject]?.midterm || '';
+                midtermInput.classList.add('subject-input');
+                subjectContainer.appendChild(midtermInput);
+
+                const finalInput = document.createElement('input');
+                finalInput.type = 'number';
+                finalInput.placeholder = 'Final';
+                finalInput.value = student[subject]?.final || '';
+                finalInput.classList.add('subject-input');
+                subjectContainer.appendChild(finalInput);
+
+                const labInput = document.createElement('input');
+                labInput.type = 'number';
+                labInput.placeholder = 'Lab';
+                labInput.value = student[subject]?.lab || '';
+                labInput.classList.add('subject-input');
+                subjectContainer.appendChild(labInput);
+
+                const assignment1Input = document.createElement('input');
+                assignment1Input.type = 'number';
+                assignment1Input.placeholder = 'Assignment 1';
+                assignment1Input.value = student[subject]?.assignment1 || '';
+                assignment1Input.classList.add('subject-input');
+                subjectContainer.appendChild(assignment1Input);
+
+                const assignment2Input = document.createElement('input');
+                assignment2Input.type = 'number';
+                assignment2Input.placeholder = 'Assignment 2';
+                assignment2Input.value = student[subject]?.assignment2 || '';
+                assignment2Input.classList.add('subject-input');
+                subjectContainer.appendChild(assignment2Input);
+
+                subjectsForm.appendChild(subjectContainer);
+            });
+
+            // Show the modal
+            document.getElementById('updateDegreesModal').style.display = "block";
+        }
+
+        // Close the modal
+        document.querySelector('.close').onclick = function () {
+            document.getElementById('updateDegreesModal').style.display = "none";
+        }
+
+        // Save subjects and degrees to localStorage
+        function saveSubjectsAndDegrees() {
+            const student = students[currentStudentId];
+            const subjects = ['Math'];
+
+            // Update grades for each subject
+            subjects.forEach(subject => {
+                student[subject] = {
+                    midterm: document.querySelector(`input[placeholder="Midterm"]`).value,
+                    final: document.querySelector(`input[placeholder="Final"]`).value,
+                    lab: document.querySelector(`input[placeholder="Lab"]`).value,
+                    assignment1: document.querySelector(`input[placeholder="Assignment 1"]`).value,
+                    assignment2: document.querySelector(`input[placeholder="Assignment 2"]`).value
+                };
+            });
+
+            // Save updated data back to localStorage
+            localStorage.setItem('students', JSON.stringify(students));
+
+            // Close the modal
+            document.getElementById('updateDegreesModal').style.display = "none";
+
+            // Re-populate the student table
+            populateStudentTable();
+        }
+
+        // Delete a student
+        function deleteStudent(id) {
+            delete students[id];
+            localStorage.setItem('students', JSON.stringify(students));
+            populateStudentTable();
+        }
+
+        // Initial population of the student table
+        populateStudentTable();
+    </script>
+</body>
+
+</html>

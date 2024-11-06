@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin System</title>
+    <title>Admin Dashboard</title>
     <style>
         body {
             margin: 0;
@@ -73,39 +73,12 @@
             padding: 20px;
             transition: background-color 0.3s ease;
             overflow-y: auto;
-            margin-left: 260px; /* Space for sidebar */
+            margin-left: 260px;
         }
 
         .main-content h2 {
             font-size: 28px;
             margin-bottom: 20px;
-        }
-
-        .result-summary {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .result-summary div {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 30%;
-            text-align: center;
-        }
-
-        .results-section {
-            margin-top: 30px;
-        }
-
-        .result-card {
-            background-color: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .student-form {
@@ -116,9 +89,7 @@
             margin-bottom: 20px;
         }
 
-        input[type="text"],
-        input[type="number"],
-        select {
+        input[type="text"] {
             width: 100%;
             padding: 8px;
             margin: 5px 0;
@@ -145,11 +116,14 @@
             margin-top: 20px;
         }
 
-        table, th, td {
+        table,
+        th,
+        td {
             border: 1px solid #ccc;
         }
 
-        th, td {
+        th,
+        td {
             padding: 10px;
             text-align: left;
         }
@@ -171,7 +145,7 @@
         /* Responsive */
         @media (max-width: 768px) {
             .main-content {
-                margin-left: 0; /* No sidebar on small screens */
+                margin-left: 0;
             }
         }
     </style>
@@ -180,7 +154,7 @@
 <body>
     <div class="sidebar">
         <div>
-            <h2><i class="fas fa-user-graduate"></i>Admin Dashboard</h2>
+            <h2>Admin Dashboard</h2>
             <a href="home.html">Home</a>
             <a href="results.html">View Results</a>
             <a href="degrees.html">Degrees Calculator</a>
@@ -195,240 +169,77 @@
     </div>
 
     <div class="main-content">
-        <h2 id="student-name">Welcome, [Student Name]</h2>
+        <h2 id="student-name">Welcome, Admin</h2>
 
-        <div class="filter-section">
-            <label for="student-select">Select Student:</label>
-            <select id="student-select">
-                <option value="" disabled selected>Select a student</option>
-                <!-- Student options dynamically populated -->
-            </select>
-        </div>
-
-        <div class="result-summary" id="result-summary">
-            <div><strong>Total Subjects:</strong> <span id="total-subjects">0</span></div>
-            <div><strong>Average Grade:</strong> <span id="average-grade">0.00</span></div>
-            <div><strong>Whole Average:</strong> <span id="whole-average">0.00</span></div>
-        </div>
-
-        <div class="results-section" id="results-section">
-            <!-- Results will be filled dynamically -->
-        </div>
-
-        <h3>Add/Edit Student</h3>
+        <h3>Add Student</h3>
         <form id="studentForm" class="student-form">
-            <input type="hidden" id="studentId" value="">
-            <label for="studentName">Name:</label>
+            <label for="studentName">Student Name:</label>
             <input type="text" id="studentName" required>
-            <div id="subject-container">
-                <div class="subject-entry">
-                    <label for="subject">Subject:</label>
-                    <input type="text" class="subject" required>
-                    <label for="quizzes">Quizzes:</label>
-                    <input type="number" class="quizzes" required>
-                    <label for="assignments">Assignments:</label>
-                    <input type="number" class="assignments" required>
-                    <label for="midterm">Midterm:</label>
-                    <input type="number" class="midterm" required>
-                    <label for="final">Final:</label>
-                    <input type="number" class="final" required>
-                    <button type="button" class="remove-subject" onclick="removeSubject(this)">Remove Subject</button>
-                </div>
-            </div>
-            <button type="button" onclick="addSubject()">Add Another Subject</button>
             <button type="submit">Add Student</button>
         </form>
 
         <h3>Student List</h3>
-        <div class="filter-section">
-            <label for="search">Search:</label>
-            <input type="text" id="search" oninput="filterStudents()">
-        </div>
         <table id="studentTable">
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Subjects</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Student rows dynamically populated -->
+                <!-- Students listed dynamically -->
             </tbody>
         </table>
     </div>
 
     <script>
         const students = JSON.parse(localStorage.getItem('students')) || {};
-        const dummyData = {
-            '1': { name: 'John Doe', subjects: { 'Math': { quizzes: 85, assignments: 90, midterm: 88, final: 92 }, 'Science': { quizzes: 78, assignments: 85, midterm: 80, final: 75 } } },
-            '2': { name: 'Jane Smith', subjects: { 'English': { quizzes: 80, assignments: 82, midterm: 79, final: 85 }, 'History': { quizzes: 88, assignments: 92, midterm: 90, final: 87 } } },
-            '3': { name: 'Alice Johnson', subjects: { 'Math': { quizzes: 70, assignments: 75, midterm: 72, final: 80 }, 'Biology': { quizzes: 85, assignments: 90, midterm: 88, final: 92 } } },
-            '4': { name: 'Bob Brown', subjects: { 'Chemistry': { quizzes: 75, assignments: 80, midterm: 78, final: 82 }, 'Physics': { quizzes: 85, assignments: 90, midterm: 88, final: 92 } } },
-        };
 
-        // Initialize dummy data
-        Object.assign(students, dummyData);
-        localStorage.setItem('students', JSON.stringify(students));
-
-        const studentSelect = document.getElementById('student-select');
-        const studentTable = document.getElementById('studentTable').getElementsByTagName('tbody')[0];
-        const resultSummary = document.getElementById('result-summary');
-        const averageGradeElem = document.getElementById('average-grade');
-        const totalSubjectsElem = document.getElementById('total-subjects');
-        const wholeAverageElem = document.getElementById('whole-average');
-        const resultsSection = document.getElementById('results-section');
-
-        function populateStudentSelect() {
-            for (let id in students) {
-                let option = document.createElement('option');
-                option.value = id;
-                option.textContent = students[id].name;
-                studentSelect.appendChild(option);
-            }
-        }
-
+        // Populate the student table with the existing students
         function populateStudentTable() {
-            studentTable.innerHTML = '';
+            const studentTable = document.getElementById('studentTable').getElementsByTagName('tbody')[0];
+            studentTable.innerHTML = '';  // Clear existing rows
             for (let id in students) {
+                const student = students[id];
                 let row = studentTable.insertRow();
-                let nameCell = row.insertCell(0);
-                let subjectsCell = row.insertCell(1);
-                let actionsCell = row.insertCell(2);
-                nameCell.textContent = students[id].name;
-                subjectsCell.textContent = Object.keys(students[id].subjects).join(', ');
-                let editBtn = document.createElement('button');
-                editBtn.textContent = 'Edit';
-                editBtn.onclick = () => editStudent(id);
-                actionsCell.appendChild(editBtn);
-                let deleteBtn = document.createElement('button');
+                row.insertCell(0).textContent = student.name;
+
+                let actionsCell = row.insertCell(1);
+                const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = 'Delete';
                 deleteBtn.onclick = () => deleteStudent(id);
                 actionsCell.appendChild(deleteBtn);
             }
         }
 
-        function editStudent(id) {
-            const student = students[id];
-            document.getElementById('studentId').value = id;
-            document.getElementById('studentName').value = student.name;
-            document.getElementById('subject-container').innerHTML = '';
+        // Add new student to the list
+        document.getElementById('studentForm').onsubmit = function (e) {
+            e.preventDefault();
+            const studentName = document.getElementById('studentName').value;
 
-            for (let subject in student.subjects) {
-                addSubject();
-                const subjectEntry = document.querySelectorAll('.subject-entry')[document.querySelectorAll('.subject-entry').length - 1];
-                subjectEntry.querySelector('.subject').value = subject;
-                subjectEntry.querySelector('.quizzes').value = student.subjects[subject].quizzes;
-                subjectEntry.querySelector('.assignments').value = student.subjects[subject].assignments;
-                subjectEntry.querySelector('.midterm').value = student.subjects[subject].midterm;
-                subjectEntry.querySelector('.final').value = student.subjects[subject].final;
-            }
-            calculateResults(id);
-        }
+            const newId = Object.keys(students).length + 1;
+            students[newId] = { name: studentName };
+            localStorage.setItem('students', JSON.stringify(students));
 
+            // Reset the form and update the table
+            document.getElementById('studentForm').reset();
+            populateStudentTable();
+        };
+
+        // Delete student from localStorage
         function deleteStudent(id) {
             delete students[id];
             localStorage.setItem('students', JSON.stringify(students));
             populateStudentTable();
         }
 
-        function addSubject() {
-            const subjectContainer = document.getElementById('subject-container');
-            const subjectEntry = document.createElement('div');
-            subjectEntry.classList.add('subject-entry');
-            subjectEntry.innerHTML = `
-                <label for="subject">Subject:</label>
-                <input type="text" class="subject" required>
-                <label for="quizzes">Quizzes:</label>
-                <input type="number" class="quizzes" required>
-                <label for="assignments">Assignments:</label>
-                <input type="number" class="assignments" required>
-                <label for="midterm">Midterm:</label>
-                <input type="number" class="midterm" required>
-                <label for="final">Final:</label>
-                <input type="number" class="final" required>
-                <button type="button" class="remove-subject" onclick="removeSubject(this)">Remove Subject</button>
-            `;
-            subjectContainer.appendChild(subjectEntry);
-        }
-
-        function removeSubject(button) {
-            button.parentElement.remove();
-        }
-
-        function filterStudents() {
-            const searchTerm = document.getElementById('search').value.toLowerCase();
-            const rows = studentTable.getElementsByTagName('tr');
-            for (let row of rows) {
-                const name = row.cells[0].textContent.toLowerCase();
-                row.style.display = name.includes(searchTerm) ? '' : 'none';
-            }
-        }
-
-        document.getElementById('studentForm').onsubmit = function (e) {
-            e.preventDefault();
-            const studentId = document.getElementById('studentId').value;
-            const studentName = document.getElementById('studentName').value;
-            const subjects = {};
-
-            document.querySelectorAll('.subject-entry').forEach(entry => {
-                const subject = entry.querySelector('.subject').value;
-                const quizzes = parseFloat(entry.querySelector('.quizzes').value);
-                const assignments = parseFloat(entry.querySelector('.assignments').value);
-                const midterm = parseFloat(entry.querySelector('.midterm').value);
-                const final = parseFloat(entry.querySelector('.final').value);
-                subjects[subject] = { quizzes, assignments, midterm, final };
-            });
-
-            if (studentId) {
-                students[studentId] = { name: studentName, subjects };
-            } else {
-                const newId = Object.keys(students).length + 1;
-                students[newId] = { name: studentName, subjects };
-            }
-
-            localStorage.setItem('students', JSON.stringify(students));
-            populateStudentTable();
-            calculateResults();
-        };
-
-        function calculateResults(id = null) {
-            const selectedStudentId = id || studentSelect.value;
-            if (!selectedStudentId) return;
-
-            const student = students[selectedStudentId];
-            const subjectEntries = Object.entries(student.subjects);
-            let totalSubjects = subjectEntries.length;
-            let totalGrades = 0;
-            let totalWhole = 0;
-
-            subjectEntries.forEach(([subject, grades]) => {
-                const { quizzes, assignments, midterm, final } = grades;
-                const average = (quizzes + assignments + midterm + final) / 4;
-                totalGrades += average;
-                totalWhole += quizzes + assignments + midterm + final;
-                resultsSection.innerHTML += `<div class="result-card"><strong>${subject}</strong><br>Quizzes: ${quizzes}<br>Assignments: ${assignments}<br>Midterm: ${midterm}<br>Final: ${final}<br><strong>Average: ${average.toFixed(2)}</strong></div>`;
-            });
-
-            averageGradeElem.textContent = (totalGrades / totalSubjects).toFixed(2);
-            totalSubjectsElem.textContent = totalSubjects;
-            wholeAverageElem.textContent = (totalWhole / (totalSubjects * 4)).toFixed(2);
-        }
-
-        studentSelect.onchange = () => {
-            const selectedId = studentSelect.value;
-            if (selectedId) {
-                calculateResults(selectedId);
-                document.getElementById('student-name').textContent = `Welcome, ${students[selectedId].name}`;
-            }
-        };
-
-        document.getElementById('darkModeToggle').onclick = () => {
+        // Dark Mode toggle functionality
+        document.getElementById('darkModeToggle').onclick = function () {
             document.body.classList.toggle('dark-mode');
             document.querySelector('.sidebar').classList.toggle('dark-mode');
         };
 
-        populateStudentSelect();
+        // Initial population of student table
         populateStudentTable();
     </script>
 </body>

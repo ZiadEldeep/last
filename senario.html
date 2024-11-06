@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Degrees Lookup and Certification</title>
+    <style>
+        /* Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: #007bff;
+        }
+
+        .search-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .search-container input {
+            padding: 8px 12px;
+            font-size: 16px;
+            width: 300px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
+
+        .search-container button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .student-degrees {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .student-degrees table {
+            width: 50%;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+        .student-degrees th, .student-degrees td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .student-degrees th {
+            background-color: #f1f1f1;
+            color: #007bff;
+        }
+
+        .no-student-found {
+            text-align: center;
+            color: red;
+        }
+
+        .average-percentage {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .print-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .print-button:hover {
+            background-color: #218838;
+        }
+
+        /* Certification styling for printing */
+        .certificate {
+            border: 5px solid #007bff;
+            border-radius: 10px;
+            padding: 30px;
+            width: 80%;
+            margin: 20px auto;
+            text-align: center;
+            background-color: #fff;
+        }
+
+        .certificate h1 {
+            color: #007bff;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .certificate h2 {
+            font-size: 1.8rem;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .certificate .student-name {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .certificate .subject-table {
+            width: 70%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .certificate .subject-table th, .certificate .subject-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .certificate .subject-table th {
+            background-color: #f1f1f1;
+            color: #007bff;
+        }
+
+        .certificate .average-section {
+            margin-top: 30px;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        /* Hide the print button when printing */
+        @media print {
+            .print-button {
+                display: none;
+            }
+
+            .certificate {
+                width: 100%;
+                padding: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Student Degree Lookup and Certification</h2>
+
+    <div class="search-container">
+        <input type="text" id="studentName" placeholder="Enter student name">
+        <button onclick="searchStudent()">Search</button>
+    </div>
+
+    <div id="studentDetails" class="student-degrees"></div>
+    <div id="noStudentFound" class="no-student-found" style="display: none;">Student not found!</div>
+
+    <script>
+        // Function to search for a student by name
+        function searchStudent() {
+            const studentName = document.getElementById('studentName').value.trim();
+            if (!studentName) {
+                alert('Please enter a student name.');
+                return;
+            }
+
+            // Retrieve students from localStorage
+            const students = JSON.parse(localStorage.getItem('students')) || {};
+
+            // Find the student by name
+            let studentFound = false;
+            for (let id in students) {
+                const student = students[id];
+                if (student.name.toLowerCase() === studentName.toLowerCase()) {
+                    displayStudentDegrees(student);
+                    studentFound = true;
+                    break;
+                }
+            }
+
+            // Show a message if no student was found
+            if (!studentFound) {
+                document.getElementById('studentDetails').innerHTML = '';
+                document.getElementById('noStudentFound').style.display = 'block';
+            } else {
+                document.getElementById('noStudentFound').style.display = 'none';
+            }
+        }
+
+        // Function to display the student's degrees and calculate average and percentage
+        function displayStudentDegrees(student) {
+            const studentDetailsDiv = document.getElementById('studentDetails');
+            let degreesHtml = `<div class="certificate">
+                <h1>Certificate of Completion</h1>
+                <h2>Academic Achievement</h2>
+                <p class="student-name">${student.name}</p>
+                <p>Has successfully completed the following course evaluations:</p>
+                <table class="subject-table">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Midterm</th>
+                            <th>Final</th>
+                            <th>Lab</th>
+                            <th>Assignment 1</th>
+                            <th>Assignment 2</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            let totalScore = 0;
+            let totalPossibleScore = 0;
+            const subjects = ['Math']; // You can add more subjects here (e.g., 'Science', 'History')
+
+            // Loop through the subjects and display the grades
+            subjects.forEach(subject => {
+                const subjectGrades = student[subject] || {};
+
+                // Add up the grades
+                const midterm = parseFloat(subjectGrades.midterm || 0);
+                const final = parseFloat(subjectGrades.final || 0);
+                const lab = parseFloat(subjectGrades.lab || 0);
+                const assignment1 = parseFloat(subjectGrades.assignment1 || 0);
+                const assignment2 = parseFloat(subjectGrades.assignment2 || 0);
+
+                // Calculate total and possible scores for percentage calculation
+                const subjectTotal = midterm + final + lab + assignment1 + assignment2;
+                const subjectPossible = 100 * 5; // Assuming each grade is out of 100
+
+                totalScore += subjectTotal;
+                totalPossibleScore += subjectPossible;
+
+                degreesHtml += `
+                    <tr>
+                        <td>${subject}</td>
+                        <td>${midterm || 'N/A'}</td>
+                        <td>${final || 'N/A'}</td>
+                        <td>${lab || 'N/A'}</td>
+                        <td>${assignment1 || 'N/A'}</td>
+                        <td>${assignment2 || 'N/A'}</td>
+                    </tr>
+                `;
+            });
+
+            degreesHtml += `</tbody></table>`;
+
+            // Calculate average and percentage
+            const averageScore = totalScore / subjects.length;
+            const percentage = (totalScore / totalPossibleScore) * 100;
+
+            // Display average and percentage
+            const averagePercentageHtml = `
+                <div class="average-section">
+                    <p><strong>Average Score:</strong> ${averageScore.toFixed(2)}</p>
+                    <p><strong>Percentage:</strong> ${percentage.toFixed(2)}%</p>
+                </div>
+            `;
+
+            // Add a button to print the certification
+            const printButtonHtml = `
+                <button class="print-button" onclick="printCertificate()">Print Certificate</button>
+            `;
+
+            studentDetailsDiv.innerHTML = degreesHtml + averagePercentageHtml + printButtonHtml;
+        }
+
+        // Function to print the certificate
+        function printCertificate() {
+            const printContent = document.getElementById('studentDetails').innerHTML;
+            const originalContent = document.body.innerHTML;
+
+            // Temporarily replace the body content with the certificate content
+            document.body.innerHTML = printContent;
+
+            // Trigger print
+            window.print();
+
+            // Restore the original body content
+            document.body.innerHTML = originalContent;
+        }
+    </script>
+</body>
+</html>
