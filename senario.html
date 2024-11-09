@@ -173,6 +173,19 @@
     <div id="noStudentFound" class="no-student-found" style="display: none;">Student not found!</div>
 
     <script>
+        // Grade mapping function
+        function getGrade(percentage) {
+            if (percentage >= 95) return 'A+';
+            if (percentage >= 90) return 'A';
+            if (percentage >= 85) return 'B+';
+            if (percentage >= 80) return 'B';
+            if (percentage >= 75) return 'C+';
+            if (percentage >= 70) return 'C';
+            if (percentage >= 65) return 'D+';
+            if (percentage >= 60) return 'D';
+            return 'F';
+        }
+
         // Function to search for a student by name
         function searchStudent() {
             const studentName = document.getElementById('studentName').value.trim();
@@ -264,12 +277,14 @@
             // Calculate average and percentage
             const averageScore = totalScore / subjects.length;
             const percentage = (totalScore / totalPossibleScore) * 100;
+            const grade = getGrade(percentage);
 
-            // Display average and percentage
+            // Display average, percentage, and grade
             const averagePercentageHtml = `
                 <div class="average-section">
-                    <p><strong>Average Score:</strong> ${averageScore.toFixed(2)}</p>
+                    <p><strong>Average Score:</strong> ${averageScore.toFixed(0)}/100</p>
                     <p><strong>Percentage:</strong> ${percentage.toFixed(2)}%</p>
+                    <p><strong>Grade:</strong> ${grade}</p>
                 </div>
             `;
 

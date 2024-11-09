@@ -165,12 +165,21 @@
         .add-subject-degree-btn:hover {
             background-color: #218838;
         }
+
+        /* Chart Styles */
+        .chart-container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
     </style>
 </head>
 
 <body>
 
     <h2>Teacher's Degrees Management</h2>
+
+    
 
     <h3>Student List</h3>
     <table id="studentTable">
@@ -196,7 +205,11 @@
             <button onclick="saveSubjectsAndDegrees()" class="add-subject-degree-btn">Save Changes</button>
         </div>
     </div>
-
+<!-- Chart Container -->
+<div class="chart-container">
+    <canvas id="studentChart" width="200" height="50"></canvas>
+</div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Retrieve students from localStorage
         const students = JSON.parse(localStorage.getItem('students')) || {};
@@ -217,13 +230,6 @@
 
                 let actionsCell = row.insertCell(1);
 
-                // Create Edit button
-                // const editBtn = document.createElement('button');
-                // editBtn.textContent = 'Edit';
-                // editBtn.classList.add('edit-btn');
-                // editBtn.onclick = () => editStudent(id);
-                // actionsCell.appendChild(editBtn);
-
                 // Create Update Subjects and Degrees button
                 const updateDegreesBtn = document.createElement('button');
                 updateDegreesBtn.textContent = 'Update Subjects & Degrees';
@@ -238,6 +244,9 @@
                 deleteBtn.onclick = () => deleteStudent(id);
                 actionsCell.appendChild(deleteBtn);
             }
+
+            // Update the chart after populating the table
+            updateChart();
         }
 
         // Open the modal to update subjects and degrees
@@ -246,7 +255,7 @@
             const student = students[id];
             document.getElementById('modal-student-name').textContent = student.name;
 
-            // Generate subject forms for Math, Science, and History
+            // Generate subject forms for Math
             const subjectsForm = document.getElementById('subjectsForm');
             subjectsForm.innerHTML = '';  // Clear existing forms
 
@@ -263,35 +272,30 @@
                 midtermInput.type = 'number';
                 midtermInput.placeholder = 'Midterm';
                 midtermInput.value = student[subject]?.midterm || '';
-                midtermInput.classList.add('subject-input');
                 subjectContainer.appendChild(midtermInput);
 
                 const finalInput = document.createElement('input');
                 finalInput.type = 'number';
                 finalInput.placeholder = 'Final';
                 finalInput.value = student[subject]?.final || '';
-                finalInput.classList.add('subject-input');
                 subjectContainer.appendChild(finalInput);
 
                 const labInput = document.createElement('input');
                 labInput.type = 'number';
                 labInput.placeholder = 'Lab';
                 labInput.value = student[subject]?.lab || '';
-                labInput.classList.add('subject-input');
                 subjectContainer.appendChild(labInput);
 
                 const assignment1Input = document.createElement('input');
                 assignment1Input.type = 'number';
                 assignment1Input.placeholder = 'Assignment 1';
                 assignment1Input.value = student[subject]?.assignment1 || '';
-                assignment1Input.classList.add('subject-input');
                 subjectContainer.appendChild(assignment1Input);
 
                 const assignment2Input = document.createElement('input');
                 assignment2Input.type = 'number';
                 assignment2Input.placeholder = 'Assignment 2';
                 assignment2Input.value = student[subject]?.assignment2 || '';
-                assignment2Input.classList.add('subject-input');
                 subjectContainer.appendChild(assignment2Input);
 
                 subjectsForm.appendChild(subjectContainer);
@@ -339,7 +343,76 @@
             populateStudentTable();
         }
 
-        // Initial population of the student table
+        // Calculate the number of passed students
+        function calculatePassedStudents() {
+            let passedCount = 0;
+
+            for (let id in students) {
+                const student = students[id];
+                const totalScore = (parseFloat(student.Math?.midterm || 0) +
+                    parseFloat(student.Math?.final || 0) +
+                    parseFloat(student.Math?.lab || 0) +
+                    parseFloat(student.Math?.assignment1 || 0) +
+                    parseFloat(student.Math?.assignment2 || 0));
+
+                if (totalScore > 50) {
+                    passedCount++;
+                }
+            }
+
+            return passedCount;
+        }
+
+        // Calculate the number of failed students
+        function calculateFailedStudents() {
+            let failedCount = 0;
+
+            for (let id in students) {
+                const student = students[id];
+                const totalScore = (parseFloat(student.Math?.midterm || 0) +
+                    parseFloat(student.Math?.final || 0) +
+                    parseFloat(student.Math?.lab || 0) +
+                    parseFloat(student.Math?.assignment1 || 0) +
+                    parseFloat(student.Math?.assignment2 || 0));
+
+                if (totalScore <= 50) {
+                    failedCount++;
+                }
+            }
+
+            return failedCount;
+        }
+
+        // Update the success and failure chart
+        function updateChart() {
+            const passed = calculatePassedStudents();
+            const failed = calculateFailedStudents();
+
+            const ctx = document.getElementById('studentChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Passed', 'Failed'],
+                    datasets: [{
+                        label: 'Number of Students',
+                        data: [passed, failed],
+                        backgroundColor: ['#28a745', '#dc3545'],
+                        borderColor: ['#218838', '#c82333'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initial population of the student table and chart
         populateStudentTable();
     </script>
 </body>
