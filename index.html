@@ -110,17 +110,32 @@
     </footer>
 
     <script>
+        // Retrieve stored students from localStorage
+        const students = JSON.parse(localStorage.getItem('students')) || {};
+
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
+
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            if (username === 'admin@admin.com' && password === 'admin') {
+            let isValidStudent = false;
+
+            // Check if the entered username (student name) and password (student ID) match any stored student
+            for (let id in students) {
+                const student = students[id];
+                if (student.name === username && student.id === password) {
+                    isValidStudent = true;
+                    break;
+                }
+            }
+
+            if (isValidStudent) {
+                window.location.href = 'senario.html'; // Redirect to student dashboard
+            } else if (username === 'admin@admin.com' && password === 'admin') {
                 window.location.href = 'dashboard.html'; // Redirect to admin page
-            } else if (username === 'user@user.com' && password === 'user') {
-                window.location.href = 'senario.html'; // Redirect to user page
             } else if (username === 'teacher@teacher.com' && password === 'teacher') {
-                window.location.href = 'edit.html'; // Redirect to user page
+                window.location.href = 'edit.html'; // Redirect to teacher page
             } else {
                 alert('Invalid username or password. Please try again.');
             }
@@ -128,4 +143,3 @@
     </script>
 </body>
 </html>
-    
