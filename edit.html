@@ -13,6 +13,46 @@
             background-color: #f8f9fa;
             color: #333;
             padding: 20px;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #007bff;
+            padding-top: 20px;
+            color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            color: white;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: #0056b3;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: 100%;
         }
 
         h2 {
@@ -91,42 +131,117 @@
             text-align: center;
             margin-top: 20px;
         }
+
+        /* Modal Styles */
+        #updateDegreesModal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 4px;
+            width: 60%;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 25px;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .subject-container {
+            margin-bottom: 15px;
+        }
+
+        .subject-container input {
+            margin: 5px;
+            padding: 5px;
+            width: 80px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .add-subject-degree-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .add-subject-degree-btn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 
 <body>
 
-    <h2>Teacher's Degrees Management</h2>
-
-    <h3>Student List</h3>
-    <table id="studentTable">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Students will be dynamically populated here -->
-        </tbody>
-    </table>
-
-    <!-- Modal for updating subjects and degrees -->
-    <div id="updateDegreesModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3>Update Subjects and Degrees for <span id="modal-student-name"></span></h3>
-
-            <div id="subjectsForm"></div>
-
-            <button onclick="saveSubjectsAndDegrees()" class="add-subject-degree-btn">Save Changes</button>
-        </div>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Dashboard</h1>
+        <!-- <a href="#">Dashboard</a> -->
+        <a href="edit.html">Edit Students</a>
+        <a href="report.html">View Student Report</a>
+        <a href="index.html">LogOut</a>
     </div>
 
-    <!-- Link to the report page -->
-    <div class="chart-link">
-        <a href="report.html" class="update-degrees-btn">View Student Report</a>
+    <!-- Main Content -->
+    <div class="main-content">
+        <h2>Teacher's Degrees Management</h2>
+
+        <h3>Student List</h3>
+        <table id="studentTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Students will be dynamically populated here -->
+            </tbody>
+        </table>
+
+        <!-- Modal for updating subjects and degrees -->
+        <div id="updateDegreesModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Update Subjects and Degrees for <span id="modal-student-name"></span></h3>
+
+                <div id="subjectsForm"></div>
+
+                <button onclick="saveSubjectsAndDegrees()" class="add-subject-degree-btn">Save Changes</button>
+            </div>
+        </div>
+
+        <!-- Link to the report page -->
+        <div class="chart-link">
+            <a href="report.html" class="update-degrees-btn">View Student Report</a>
+        </div>
     </div>
 
     <script>
