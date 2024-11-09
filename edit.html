@@ -85,92 +85,11 @@
             background-color: #c82333;
         }
 
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-            padding-top: 60px;
-        }
-
-        .modal-content {
-            background-color: #fff;
-            margin: 5% auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 80%;
-            max-width: 600px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #000;
-            text-decoration: none;
-        }
-
-        /* Form Styling */
-        .subject-form {
-            margin-bottom: 20px;
-        }
-
-        .subject-form input {
-            padding: 8px 12px;
-            margin: 6px;
-            width: calc(33% - 16px);
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .subject-form label {
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        .subject-container {
-            margin-bottom: 20px;
-        }
-
-        .subject-container input {
-            width: 80px;
-        }
-
-        /* Save Button */
-        .add-subject-degree-btn {
-            background-color: #28a745;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            font-size: 16px;
-        }
-
-        .add-subject-degree-btn:hover {
-            background-color: #218838;
-        }
-
-        /* Chart Styles */
-        .chart-container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px 0;
+        /* Chart Link */
+        .chart-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -179,12 +98,11 @@
 
     <h2>Teacher's Degrees Management</h2>
 
-    
-
     <h3>Student List</h3>
     <table id="studentTable">
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Name</th>
                 <th>Actions</th>
             </tr>
@@ -205,11 +123,12 @@
             <button onclick="saveSubjectsAndDegrees()" class="add-subject-degree-btn">Save Changes</button>
         </div>
     </div>
-<!-- Chart Container -->
-<div class="chart-container">
-    <canvas id="studentChart" width="200" height="50"></canvas>
-</div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Link to the report page -->
+    <div class="chart-link">
+        <a href="report.html" class="update-degrees-btn">View Student Report</a>
+    </div>
+
     <script>
         // Retrieve students from localStorage
         const students = JSON.parse(localStorage.getItem('students')) || {};
@@ -226,9 +145,10 @@
             for (let id in students) {
                 const student = students[id];
                 let row = studentTable.insertRow();
-                row.insertCell(0).textContent = student.name;
+                row.insertCell(0).textContent = id; // Display ID
+                row.insertCell(1).textContent = student.name; // Display Name
 
-                let actionsCell = row.insertCell(1);
+                let actionsCell = row.insertCell(2);
 
                 // Create Update Subjects and Degrees button
                 const updateDegreesBtn = document.createElement('button');
@@ -244,9 +164,6 @@
                 deleteBtn.onclick = () => deleteStudent(id);
                 actionsCell.appendChild(deleteBtn);
             }
-
-            // Update the chart after populating the table
-            updateChart();
         }
 
         // Open the modal to update subjects and degrees
@@ -343,76 +260,7 @@
             populateStudentTable();
         }
 
-        // Calculate the number of passed students
-        function calculatePassedStudents() {
-            let passedCount = 0;
-
-            for (let id in students) {
-                const student = students[id];
-                const totalScore = (parseFloat(student.Math?.midterm || 0) +
-                    parseFloat(student.Math?.final || 0) +
-                    parseFloat(student.Math?.lab || 0) +
-                    parseFloat(student.Math?.assignment1 || 0) +
-                    parseFloat(student.Math?.assignment2 || 0));
-
-                if (totalScore > 50) {
-                    passedCount++;
-                }
-            }
-
-            return passedCount;
-        }
-
-        // Calculate the number of failed students
-        function calculateFailedStudents() {
-            let failedCount = 0;
-
-            for (let id in students) {
-                const student = students[id];
-                const totalScore = (parseFloat(student.Math?.midterm || 0) +
-                    parseFloat(student.Math?.final || 0) +
-                    parseFloat(student.Math?.lab || 0) +
-                    parseFloat(student.Math?.assignment1 || 0) +
-                    parseFloat(student.Math?.assignment2 || 0));
-
-                if (totalScore <= 50) {
-                    failedCount++;
-                }
-            }
-
-            return failedCount;
-        }
-
-        // Update the success and failure chart
-        function updateChart() {
-            const passed = calculatePassedStudents();
-            const failed = calculateFailedStudents();
-
-            const ctx = document.getElementById('studentChart').getContext('2d');
-            const chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Passed', 'Failed'],
-                    datasets: [{
-                        label: 'Number of Students',
-                        data: [passed, failed],
-                        backgroundColor: ['#28a745', '#dc3545'],
-                        borderColor: ['#218838', '#c82333'],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        // Initial population of the student table and chart
+        // Initial population of the student table
         populateStudentTable();
     </script>
 </body>

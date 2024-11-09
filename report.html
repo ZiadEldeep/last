@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Report</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: #007bff;
+        }
+
+        .chart-container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .update-degrees-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .update-degrees-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Student Performance Report</h2>
+
+    <!-- Total Degrees Chart -->
+    <div class="chart-container">
+        <canvas id="studentChart" width="400" height="200"></canvas>
+    </div>
+
+    <!-- Category Summation Chart -->
+    <div class="chart-container">
+        <canvas id="categoryChart" width="400" height="200"></canvas>
+    </div>
+
+    <div class="back-link">
+        <a href="edit.html" class="update-degrees-btn">Back to Edit Students</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Retrieve students data from localStorage
+        const students = JSON.parse(localStorage.getItem('students')) || {};
+
+        // Calculate total degrees for each student
+        function calculateTotalDegrees() {
+            let totalDegrees = [];
+
+            for (let id in students) {
+                const student = students[id];
+
+                // Sum up the degrees for each subject (e.g., Math)
+                const totalScore = (parseFloat(student.Math?.midterm || 0) +
+                    parseFloat(student.Math?.final || 0) +
+                    parseFloat(student.Math?.lab || 0) +
+                    parseFloat(student.Math?.assignment1 || 0) +
+                    parseFloat(student.Math?.assignment2 || 0));
+
+                totalDegrees.push(totalScore);
+            }
+
+            return totalDegrees;
+        }
+
+        // Calculate category totals (Midterm, Final, Lab, Assignment 1, and Assignment 2)
+        function calculateCategoryTotals() {
+            let categoryTotals = {
+                midterm: 0,
+                final: 0,
+                lab: 0,
+                assignment1: 0,
+                assignment2: 0
+            };
+
+            for (let id in students) {
+                const student = students[id];
+
+                categoryTotals.midterm += parseFloat(student.Math?.midterm || 0);
+                categoryTotals.final += parseFloat(student.Math?.final || 0);
+                categoryTotals.lab += parseFloat(student.Math?.lab || 0);
+                categoryTotals.assignment1 += parseFloat(student.Math?.assignment1 || 0);
+                categoryTotals.assignment2 += parseFloat(student.Math?.assignment2 || 0);
+            }
+
+            return categoryTotals;
+        }
+
+        // Update the chart for total degrees per student
+        function updateTotalDegreesChart() {
+            const totalDegrees = calculateTotalDegrees();
+            const studentNames = Object.values(students).map(student => student.name);
+
+            const ctx = document.getElementById('studentChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: studentNames, // Use student names as labels
+                    datasets: [{
+                        label: 'Total Degrees',
+                        data: totalDegrees, // Total degrees for each student
+                        backgroundColor: '#007bff', // Blue color for bars
+                        borderColor: '#0056b3', // Darker blue for the border
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Total Degrees'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update the chart for category totals (Midterm, Final, Lab, Assignment 1, and Assignment 2)
+        function updateCategoryChart() {
+            const categoryTotals = calculateCategoryTotals();
+            const categoryLabels = ['Midterm', 'Final', 'Lab', 'Assignment 1', 'Assignment 2'];
+            const categoryData = [
+                categoryTotals.midterm,
+                categoryTotals.final,
+                categoryTotals.lab,
+                categoryTotals.assignment1,
+                categoryTotals.assignment2
+            ];
+
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: categoryLabels, // Category labels (Midterm, Final, etc.)
+                    datasets: [{
+                        label: 'Total Scores in Categories',
+                        data: categoryData, // Sum of each category
+                        backgroundColor: ['#ffcc00', '#ff5722', '#4caf50', '#3f51b5', '#00bcd4'],
+                        borderColor: ['#e68900', '#e84300', '#388e3c', '#303f9f', '#0097a7'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Total Score'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize both charts
+        updateTotalDegreesChart();
+        updateCategoryChart();
+    </script>
+</body>
+
+</html>

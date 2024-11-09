@@ -165,7 +165,7 @@
     <h2>Student Degree Lookup and Certification</h2>
 
     <div class="search-container">
-        <input type="text" id="studentName" placeholder="Enter student name">
+        <input type="text" id="studentSearchInput" placeholder="Enter student name or ID">
         <button onclick="searchStudent()">Search</button>
     </div>
 
@@ -186,22 +186,24 @@
             return 'F';
         }
 
-        // Function to search for a student by name
+        // Function to search for a student by name or ID
         function searchStudent() {
-            const studentName = document.getElementById('studentName').value.trim();
-            if (!studentName) {
-                alert('Please enter a student name.');
+            const searchQuery = document.getElementById('studentSearchInput').value.trim();
+            if (!searchQuery) {
+                alert('Please enter a student name or ID.');
                 return;
             }
 
             // Retrieve students from localStorage
             const students = JSON.parse(localStorage.getItem('students')) || {};
 
-            // Find the student by name
             let studentFound = false;
+
+            // Loop through all students and check both name and ID
             for (let id in students) {
                 const student = students[id];
-                if (student.name.toLowerCase() === studentName.toLowerCase()) {
+                // Check if either name or ID matches
+                if (student.name.toLowerCase() === searchQuery.toLowerCase() || student.id === searchQuery) {
                     displayStudentDegrees(student);
                     studentFound = true;
                     break;
