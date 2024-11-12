@@ -3,143 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Student Result Management System</title>
+    <title>Student Result Management System</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body {
+        /* Reset some default styling */
+        * {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            padding: 0;
+            box-sizing: border-box;
         }
+
+        /* Body Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
         header {
-            background-color: #1e90ff;
+            background-color: #0066cc;
+            padding: 20px 0;
             color: white;
-            padding: 20px;
             text-align: center;
         }
-        main {
+
+        header .logo img {
+            width: 100px;
+            height: auto;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 80vh;
+            margin-top: 15px;
         }
-        .login-box {
-            background-color: white;
-            padding: 40px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            width: 100%;
-            max-width: 400px;
+
+        nav ul li {
+            margin: 0 15px;
         }
-        h2 {
-            margin-bottom: 20px;
-            font-size: 22px;
+
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #ffcc00;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: #004a99;
+            color: white;
+            padding: 60px 20px;
             text-align: center;
         }
-        label {
-            display: block;
+
+        .hero h1 {
+            font-size: 3em;
             margin-bottom: 10px;
-            font-weight: bold;
         }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+
+        .hero p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
         }
-        input[type="text"]::placeholder, input[type="password"]::placeholder {
-            color: #aaa;
-        }
-        .btn {
-            width: 100%;
-            padding: 10px;
-            background-color: #1e90ff;
-            color: white;
+
+        .cta-button {
+            background-color: #ffcc00;
+            color: #003366;
+            padding: 12px 30px;
+            font-size: 1.2em;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
-        }
-        .btn:hover {
-            background-color: #1c86ee;
-        }
-        .forgot-password {
-            text-align: center;
-            margin-top: 10px;
-        }
-        .forgot-password a {
-            color: #1e90ff;
             text-decoration: none;
+            margin: 10px;
+            display: inline-block;
+            transition: background-color 0.3s ease;
         }
-        .forgot-password a:hover {
+
+        .cta-button:hover {
+            background-color: #ff9900;
+        }
+
+        /* Key Features Section */
+        .features {
+            background-color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #003366;
+        }
+
+        .feature-item {
+            display: inline-block;
+            width: 22%;
+            margin: 15px;
+            text-align: center;
+        }
+
+        .feature-item i {
+            color: #0066cc;
+            margin-bottom: 15px;
+        }
+
+        .feature-item h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .feature-item p {
+            font-size: 1.1em;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            background-color: #f9f9f9;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .how-it-works h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #003366;
+        }
+
+        .how-it-works ol {
+            list-style-position: inside;
+            padding: 0;
+            font-size: 1.1em;
+        }
+
+        .how-it-works ol li {
+            margin-bottom: 10px;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        footer p {
+            margin-bottom: 10px;
+        }
+
+        footer .footer-links a {
+            color: #ffcc00;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        footer .footer-links a:hover {
             text-decoration: underline;
         }
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 14px;
-            color: #333;
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .feature-item {
+                width: 45%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .feature-item {
+                width: 90%;
+                margin-bottom: 20px;
+            }
+
+            .hero h1 {
+                font-size: 2.2em;
+            }
+
+            .cta-button {
+                font-size: 1em;
+                padding: 10px 20px;
+            }
+
+            nav ul {
+                flex-direction: column;
+                margin-top: 20px;
+            }
+
+            nav ul li {
+                margin-bottom: 10px;
+            }
+
+            footer p {
+                font-size: 0.9em;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Header Section -->
     <header>
-        <h1>Student Result Management System</h1>
+        <!-- <div class="logo">
+            <img src="logo.png" alt="SRMS Logo">
+        </div> -->
+        <nav>
+            <ul>
+                <li><a href="index">Home</a></li>
+                <!-- <li><a href="#">About Us</a></li> -->
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
     </header>
-    <main>
-        <div class="login-box">
-            <h2>Login to your account</h2>
-            <form id="loginForm">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter your username" required>
 
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
-                <button type="submit" class="btn">Login</button>
-            </form>
-            <p>If you haven't an account, please | <a href="./signup.html">Sign Up</a></p>
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Efficiently Manage Student Results & Performance</h1>
+        <p>Streamline grading, track progress, and generate reports with ease.</p>
+        <a href="about.html" class="cta-button">Learn More</a>
+        <a href="login.html" class="cta-button">Login</a>
+    </section>
 
-            <div class="forgot-password">
-                <p><a href="./forgot.html">Forgot your password?</a></p>
-            </div>
+    <!-- Key Features Section -->
+    <section class="features">
+        <h2>Why Choose Our SRMS?</h2>
+        <div class="feature-item">
+            <i class="fas fa-pencil-alt fa-3x"></i>
+            <h3>Grade Management</h3>
+            <p>Track and update student grades efficiently.</p>
         </div>
-    </main>
+        <div class="feature-item">
+            <i class="fas fa-chart-line fa-3x"></i>
+            <h3>Reports & Analytics</h3>
+            <p>Generate detailed performance reports for students.</p>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-users fa-3x"></i>
+            <h3>Role-Based Access</h3>
+            <p>Different access levels for students, teachers, and administrators.</p>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-laptop-code fa-3x"></i>
+            <h3>User-Friendly Interface</h3>
+            <p>Easy navigation for both tech-savvy and non-tech-savvy users.</p>
+        </div>
+    </section>
 
-    <!-- Footer -->
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+        <h2>How It Works</h2>
+        <ol>
+            <li>Teacher inputs grades and student information.</li>
+            <li>Students can view their grades and performance.</li>
+            <li>Generate performance reports for analysis.</li>
+        </ol>
+    </section>
+
+    <!-- Footer Section -->
     <footer>
-        &copy; 2024 Student Result Management System. All rights reserved.
+        <p>&copy; 2024 Student Result Management System | All Rights Reserved</p>
+        <div class="footer-links">
+            <a href="Privacy.html">Privacy Policy</a> | <a href="Terms.html">Terms of Service</a> | <a href="#">Contact</a>
+        </div>
     </footer>
-
-    <script>
-        // Retrieve stored students from localStorage
-        const students = JSON.parse(localStorage.getItem('students')) || {};
-
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            let isValidStudent = false;
-
-            // Check if the entered username (student name) and password (student ID) match any stored student
-            for (let id in students) {
-                const student = students[id];
-                if (student.name === username && student.id === password) {
-                    isValidStudent = true;
-                    break;
-                }
-            }
-
-            if (isValidStudent) {
-                window.location.href = 'senario.html'; // Redirect to student dashboard
-            } else if (username === 'admin@admin.com' && password === 'admin') {
-                window.location.href = 'admin.html'; // Redirect to admin page
-            } else if (username === 'teacher@teacher.com' && password === 'teacher') {
-                window.location.href = 'tech.html'; // Redirect to teacher page
-            } else {
-                alert('Invalid username or password. Please try again.');
-            }
-        });
-    </script>
 </body>
 </html>
