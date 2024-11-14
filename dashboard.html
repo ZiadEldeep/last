@@ -12,12 +12,6 @@
             background-color: #f4f4f4;
             color: #333;
             display: flex;
-            transition: background-color 0.3s ease;
-        }
-
-        body.dark-mode {
-            background-color: #1c1c1c;
-            color: #ccc;
         }
 
         .sidebar {
@@ -29,11 +23,6 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: background-color 0.3s ease;
-        }
-
-        .sidebar.dark-mode {
-            background-color: #333;
         }
 
         .sidebar h2 {
@@ -41,24 +30,21 @@
             margin-bottom: 30px;
         }
 
-        .sidebar a {
+        .sidebar a, .sidebar button {
             text-decoration: none;
             color: white;
             display: block;
             padding: 10px 0;
-            transition: background-color 0.3s ease;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+            font-size: 16px;
         }
 
-        .sidebar a:hover {
+        .sidebar a:hover, .sidebar button:hover {
             background-color: #1c86ee;
-        }
-
-        .sidebar.dark-mode a {
-            color: #ccc;
-        }
-
-        .sidebar.dark-mode a:hover {
-            background-color: #444;
         }
 
         .logout-btn {
@@ -66,19 +52,14 @@
             text-align: center;
             padding: 10px;
             border-radius: 5px;
+            margin-top: auto;
         }
 
         .main-content {
             flex: 1;
             padding: 20px;
-            transition: background-color 0.3s ease;
-            overflow-y: auto;
-            margin-left: 0px;
-        }
-
-        .main-content h2 {
-            font-size: 28px;
-            margin-bottom: 20px;
+            background-color: #ffffff;
+            display: none; /* Hidden initially */
         }
 
         .student-form {
@@ -116,37 +97,17 @@
             margin-top: 20px;
         }
 
-        table,
-        th,
-        td {
+        table, th, td {
             border: 1px solid #ccc;
         }
 
-        th,
-        td {
+        th, td {
             padding: 10px;
             text-align: left;
         }
 
         th {
             background-color: #f8f9fa;
-        }
-
-        .dark-mode .result-card {
-            background-color: #333;
-            color: #ccc;
-        }
-
-        .dark-mode .result-summary div {
-            background-color: #444;
-            color: #fff;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-content {
-                margin-left: 0;
-            }
         }
     </style>
 </head>
@@ -155,23 +116,15 @@
     <div class="sidebar">
         <div>
             <h2>Admin Dashboard</h2>
-            <a href="home.html">Home</a>
-            <!-- <a href="results.html">View Results</a> -->
-            <!-- <a href="degrees.html">Degrees Calculator</a> -->
+            <button onclick="showAddStudent()">Add Student</button>
             <a href="contact.html">Contact Us</a>
             <a href="about.html">About Us</a>
-            <!-- <a href="excel.html">Degrees and grades</a> -->
-            <a href="login.html" class="logout-btnn">Logout</a>
+            <a href="login.html" class="logout-btn">Logout</a>
         </div>
-        <!-- <div>
-            <button id="darkModeToggle" class="dark-mode-toggle">Enable Dark Mode</button>
-        </div> -->
     </div>
 
-    <div class="main-content">
-        <h2 id="student-name">Welcome, Admin</h2>
-
-        <h3>Add Student</h3>
+    <div class="main-content" id="mainContent">
+        <h2 id="student-name">Add Student</h2>
         <form id="studentForm" class="student-form">
             <label for="studentId">Student ID:</label>
             <input type="text" id="studentId" required>
@@ -198,10 +151,15 @@
     <script>
         const students = JSON.parse(localStorage.getItem('students')) || {};
 
+        // Show the Add Student section
+        function showAddStudent() {
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
         // Populate the student table with the existing students
         function populateStudentTable() {
             const studentTable = document.getElementById('studentTable').getElementsByTagName('tbody')[0];
-            studentTable.innerHTML = '';  // Clear existing rows
+            studentTable.innerHTML = ''; // Clear existing rows
             for (let id in students) {
                 const student = students[id];
                 let row = studentTable.insertRow();
@@ -242,12 +200,6 @@
             localStorage.setItem('students', JSON.stringify(students));
             populateStudentTable();
         }
-
-        // Dark Mode toggle functionality
-        document.getElementById('darkModeToggle').onclick = function () {
-            document.body.classList.toggle('dark-mode');
-            document.querySelector('.sidebar').classList.toggle('dark-mode');
-        };
 
         // Initial population of student table
         populateStudentTable();
