@@ -156,13 +156,17 @@
 
     <!-- Navigation Bar -->
     <nav>
-        <a href="home.html">Home</a>
-        <a href="results.html">View Student Results</a>
-        <a href="./contact.html">Contact Us</a>
-        <a href="./about.html">About Us</a>
-        <a href="dashboard.html" class="admin-btn">Admin Dashboard</a>
-        <button id="darkModeToggle" style="margin-left: 10px; padding: 10px; background: none; border: none; color: white; font-weight: bold; cursor: pointer;">
-            <i id="toggleIcon" class="fas fa-sun"></i> <!-- Initial icon -->
+        <li><a href="index.html">Home</a></li>
+        <!-- <li><a href="#">About Us</a></li> -->
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <!-- <a href="dashboard.html" class="admin-btn">Admin Dashboard</a> -->
+        <button id="darkModeToggle" aria-label="Toggle dark mode">DarkMode
+            <i class="fas fa-moon" id="toggleIcon"></i>
+        </button>
+        <button id="textSizeToggle" aria-label="Toggle text size">
+            <i class="fas fa-text-height" id="textToggleIcon"></i>
         </button>
     </nav>
 
